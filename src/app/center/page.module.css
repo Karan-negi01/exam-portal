@@ -1,0 +1,57 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 36px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+}
+
+.examRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--color-border-soft);
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.examRow:last-child {
+  border-bottom: none;
+}
+
+.examName {
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.examMeta {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+.examRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+@media (max-width: 980px) {
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}

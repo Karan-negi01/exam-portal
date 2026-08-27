@@ -1,0 +1,75 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 36px;
+}
+
+.section {
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 1.15rem;
+  margin-bottom: 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTitle {
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+.cardSub {
+  font-size: 0.84rem;
+  color: var(--color-ink-soft);
+  margin-bottom: 16px;
+}
+
+.metaRow {
+  display: flex;
+  gap: 16px;
+  font-size: 0.82rem;
+  color: var(--color-muted);
+  margin-bottom: 20px;
+}
+
+.resultRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--color-border-soft);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.resultRow:last-child {
+  border-bottom: none;
+}
+
+.resultTitle {
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.resultSub {
+  font-size: 0.82rem;
+  color: var(--color-muted);
+}
+
+.resultRight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}

@@ -1,0 +1,167 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 460px) 1fr;
+  background: var(--color-bg);
+}
+
+.side {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(190deg, #161f38 0%, #0f1729 55%, #0b1120 100%);
+  color: #e2e8f0;
+  padding: 44px 48px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sideGlow1 {
+  position: absolute;
+  top: -120px;
+  right: -100px;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.3), transparent 70%);
+  pointer-events: none;
+}
+
+.sideGlow2 {
+  position: absolute;
+  bottom: -140px;
+  left: -100px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.18), transparent 70%);
+  pointer-events: none;
+}
+
+.brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.15rem;
+  color: #fff;
+}
+
+.brandMark {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--color-primary), #818cf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.sideBody {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 340px;
+}
+
+.sideHeading {
+  font-size: 1.9rem;
+  color: #fff;
+  margin-bottom: 14px;
+  line-height: 1.25;
+}
+
+.sideText {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin-bottom: 30px;
+}
+
+.sidePoints {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidePoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.88rem;
+  color: #cbd5e1;
+}
+
+.sidePointIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.sideFoot {
+  position: relative;
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.wrap {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: var(--card-max, 460px);
+}
+
+.mobileBrand {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--color-ink);
+  margin-bottom: 28px;
+}
+
+.head {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.title {
+  font-size: 1.6rem;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--color-ink-soft);
+  font-size: 0.92rem;
+}
+
+@media (max-width: 920px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+  .side {
+    display: none;
+  }
+  .mobileBrand {
+    display: flex;
+  }
+  .wrap {
+    padding: 32px 20px 48px;
+  }
+}

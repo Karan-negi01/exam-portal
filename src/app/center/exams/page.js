@@ -1,0 +1,78 @@
+"use client";
+
+import DashboardShell from "@/components/dashboard/DashboardShell";
+import { CENTER_NAV } from "@/components/dashboard/navConfig";
+import Card from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
+import EmptyState from "@/components/ui/EmptyState";
+import { useAuth } from "@/lib/auth";
+import { useDB } from "@/lib/useDB";
+import styles from "./page.module.css";
+
+export default function CenterExamsPage() {
+  const { session } = useAuth();
+  const db = useDB();
+  const centerId = session?.centerId;
+  const exams = db.exams.filter((e) => e.centerId === centerId);
+
+  return (
+    <DashboardShell
+      navItems={CENTER_NAV}
+      roleTag="Center owner"
+      userMeta={session?.name}
+      title="Exams"
+      subtitle="Create MCQ exams, set the timer and passing marks, and track results."
+      actions={
+        <Button href="/center/exams/new" size="sm">
+          + Create exam
+        </Button>
+      }
+    >
+      {exams.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon="📝"
+            title="No exams yet"
+            description="Build your first MCQ exam — type in questions, set a timer and passing marks."
+            action={
+              <Button size="sm" href="/center/exams/new">
+                Create an exam
+              </Button>
+            }
+          />
+        </Card>
+      ) : (
+        <div className={styles.grid}>
+          {exams.map((e) => {
+            const attempts = db.attempts.filter((a) => a.examId === e.id);
+            return (
+              <Card key={e.id} className={styles.card}>
+                <div className={styles.head}>
+                  <div>
+                    <div className={styles.title}>{e.title}</div>
+                    <div className={styles.subject}>{e.subject}</div>
+                  </div>
+                  <Badge tone={e.status === "published" ? "success" : "neutral"}>{e.status}</Badge>
+                </div>
+                <div className={styles.metaRow}>
+                  <span>❓ {e.questions.length} questions</span>
+                  <span>⏱ {e.durationMinutes} min</span>
+                  <span>🎯 Pass {e.passingMarks}/{e.questions.length}</span>
+                </div>
+                <div className={styles.footRow}>
+                  <span style={{ fontSize: "0.82rem", color: "var(--color-muted)" }}>
+                    {e.status === "published" ? `${attempts.length} attempts` : "Not published"}
+                  </span>
+                  <Button href={`/center/exams/${e.id}`} variant="secondary" size="sm">
+                    View
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+    </DashboardShell>
+  );
+}

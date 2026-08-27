@@ -1,0 +1,233 @@
+.hero {
+  position: relative;
+  padding: 76px 0 90px;
+  overflow: hidden;
+}
+
+.glow {
+  position: absolute;
+  top: -140px;
+  right: -120px;
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79, 70, 229, 0.16), transparent 70%);
+  z-index: 0;
+}
+
+.glow2 {
+  position: absolute;
+  bottom: -160px;
+  left: -140px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.14), transparent 70%);
+  z-index: 0;
+}
+
+.grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 50px;
+  align-items: center;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: var(--radius-full);
+  margin-bottom: 22px;
+}
+
+.title {
+  font-size: 3.1rem;
+  color: var(--color-ink);
+  margin-bottom: 20px;
+}
+
+.titleAccent {
+  color: var(--color-primary);
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--color-ink-soft);
+  max-width: 520px;
+  margin-bottom: 32px;
+  line-height: 1.65;
+}
+
+.ctaRow {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.metaRow {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--color-ink-soft);
+}
+
+.metaIcon {
+  color: var(--color-success);
+}
+
+/* Visual mock */
+.visual {
+  position: relative;
+}
+
+.mockCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 22px;
+}
+
+.mockHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.mockDots {
+  display: flex;
+  gap: 6px;
+}
+
+.mockDots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-border);
+}
+
+.mockBadge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-success);
+  background: var(--color-success-light);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.mockRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+  margin-bottom: 10px;
+  font-size: 0.86rem;
+}
+
+.mockRowLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.mockAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), #a5b4fc);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.mockScore {
+  font-weight: 700;
+}
+
+.pass {
+  color: var(--color-success);
+}
+.fail {
+  color: var(--color-danger);
+}
+
+.floatCert {
+  position: absolute;
+  bottom: -30px;
+  right: -26px;
+  width: 230px;
+  background: linear-gradient(135deg, #fffdf7, #fff7e6);
+  border: 1px solid var(--color-accent-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  transform: rotate(4deg);
+}
+
+.floatCertTop {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-accent);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.floatCertName {
+  font-family: "Georgia", serif;
+  font-size: 1rem;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+
+.floatCertSub {
+  font-size: 0.68rem;
+  color: var(--color-ink-soft);
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .title {
+    font-size: 2.3rem;
+  }
+  .visual {
+    max-width: 460px;
+  }
+  .floatCert {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.9rem;
+  }
+}

@@ -1,0 +1,105 @@
+.section {
+  padding: 90px 0;
+}
+
+.head {
+  max-width: 600px;
+  margin: 0 auto 56px;
+  text-align: center;
+}
+
+.kicker {
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.heading {
+  font-size: 2.1rem;
+  margin-bottom: 14px;
+}
+
+.desc {
+  color: var(--color-ink-soft);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-lg);
+  padding: 30px 26px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.badge {
+  align-self: flex-start;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: 18px;
+}
+
+.badgeAdmin {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+.badgeCenter {
+  background: var(--color-accent-light);
+  color: var(--color-warning);
+}
+.badgeStudent {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0 22px;
+  flex: 1;
+}
+
+.listItem {
+  display: flex;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--color-ink-soft);
+  line-height: 1.5;
+}
+
+.tick {
+  color: var(--color-success);
+  flex-shrink: 0;
+}
+
+.link {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+@media (max-width: 860px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,47 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: var(--color-muted);
+}
+
+.control {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.control:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-light);
+}
+
+textarea.control {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.error {
+  font-size: 0.78rem;
+  color: var(--color-danger);
+}
+
+.controlError {
+  border-color: var(--color-danger);
+}

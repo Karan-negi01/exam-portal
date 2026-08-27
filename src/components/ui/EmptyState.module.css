@@ -1,0 +1,23 @@
+.wrap {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--color-ink-soft);
+}
+
+.icon {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: 1.05rem;
+  color: var(--color-ink);
+  margin-bottom: 6px;
+}
+
+.desc {
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  max-width: 380px;
+  margin: 0 auto 18px;
+}

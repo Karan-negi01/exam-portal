@@ -1,0 +1,198 @@
+.certificate {
+  width: 980px;
+  height: 680px;
+  background: linear-gradient(155deg, #fffdf8 0%, #fff9ec 100%);
+  padding: 22px;
+  font-family: "Georgia", "Times New Roman", serif;
+  color: #1e293b;
+  box-sizing: border-box;
+}
+
+.border {
+  width: 100%;
+  height: 100%;
+  border: 2px solid #d4af37;
+  outline: 1px solid #d4af37;
+  outline-offset: -10px;
+  border-radius: 6px;
+  padding: 46px 60px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.cornerTL,
+.cornerTR,
+.cornerBL,
+.cornerBR {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 3px solid #d4af37;
+}
+.cornerTL {
+  top: 10px;
+  left: 10px;
+  border-right: none;
+  border-bottom: none;
+}
+.cornerTR {
+  top: 10px;
+  right: 10px;
+  border-left: none;
+  border-bottom: none;
+}
+.cornerBL {
+  bottom: 10px;
+  left: 10px;
+  border-right: none;
+  border-top: none;
+}
+.cornerBR {
+  bottom: 10px;
+  right: 10px;
+  border-left: none;
+  border-top: none;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  color: #4f46e5;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+
+.brandMark {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #4f46e5, #818cf8);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.kicker {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #b8860b;
+  margin-top: 18px;
+}
+
+.heading {
+  font-size: 40px;
+  font-weight: 700;
+  color: #111827;
+  margin: 10px 0 22px;
+}
+
+.presentedTo {
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.studentName {
+  font-size: 46px;
+  font-weight: 700;
+  color: #1e293b;
+  border-bottom: 2px solid #d4af37;
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+  min-width: 420px;
+}
+
+.body {
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  color: #334155;
+  max-width: 640px;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+
+.examTitle {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.scoreRow {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 20px 0 30px;
+  font-family: Arial, sans-serif;
+}
+
+.scoreItem {
+  text-align: center;
+}
+
+.scoreValue {
+  font-size: 22px;
+  font-weight: 800;
+  color: #4f46e5;
+}
+
+.scoreLabel {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.footer {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-family: Arial, sans-serif;
+}
+
+.sign {
+  text-align: center;
+  min-width: 180px;
+}
+
+.signLine {
+  border-top: 1.5px solid #94a3b8;
+  padding-top: 6px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.seal {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f5d576, #d4af37);
+  color: #78350f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 4px 10px rgba(180, 130, 20, 0.35);
+}
+
+.certId {
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  color: #94a3b8;
+  margin-top: 16px;
+}

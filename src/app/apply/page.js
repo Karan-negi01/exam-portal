@@ -1,0 +1,203 @@
+"use client";
+
+import { useState } from "react";
+import FormShell from "@/components/site/FormShell";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import { Field, Input, Select } from "@/components/ui/Field";
+import { applyForCenter, findCenterByEmail } from "@/lib/store";
+import styles from "./page.module.css";
+
+const COURSE_TYPES = [
+  "Computer Typing & Tally",
+  "Basic Computer Course (CCC)",
+  "Spoken English & Soft Skills",
+  "Tailoring & Fashion Design",
+  "Beautician & Cosmetology",
+  "Data Entry Operator",
+  "Accounting & Taxation",
+  "Other Vocational Course",
+];
+
+const EMPTY = {
+  name: "",
+  ownerName: "",
+  email: "",
+  password: "",
+  phone: "",
+  location: "",
+  courseType: COURSE_TYPES[0],
+};
+
+export default function ApplyPage() {
+  const [form, setForm] = useState(EMPTY);
+  const [fileName, setFileName] = useState("");
+  const [errors, setErrors] = useState({});
+  const [formError, setFormError] = useState("");
+  const [submitted, setSubmitted] = useState(null);
+
+  function update(key, value) {
+    setForm((f) => ({ ...f, [key]: value }));
+  }
+
+  function validate() {
+    const next = {};
+    if (!form.name.trim()) next.name = "Center name is required.";
+    if (!form.ownerName.trim()) next.ownerName = "Owner name is required.";
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = "Enter a valid email address.";
+    if (form.password.length < 6) next.password = "Password must be at least 6 characters.";
+    if (!form.phone.trim()) next.phone = "Phone number is required.";
+    if (!form.location.trim()) next.location = "Location is required.";
+    if (!fileName) next.file = "Please attach a business proof document.";
+    return next;
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setFormError("");
+    const validation = validate();
+    setErrors(validation);
+    if (Object.keys(validation).length > 0) return;
+
+    if (findCenterByEmail(form.email)) {
+      setFormError("A center is already registered with this email.");
+      return;
+    }
+
+    const center = applyForCenter({ ...form, businessProofName: fileName });
+    setSubmitted(center);
+  }
+
+  if (submitted) {
+    return (
+      <FormShell maxWidth="520px">
+        <Card>
+          <div className={styles.success}>
+            <div className={styles.successIcon}>✓</div>
+            <h1 className={styles.successTitle}>Application submitted</h1>
+            <p className={styles.successText}>
+              Thanks, {submitted.ownerName.split(" ")[0]}! Your center &ldquo;{submitted.name}&rdquo; is
+              now awaiting admin review. You&apos;ll be able to log in and start enrolling students
+              as soon as it&apos;s approved.
+            </p>
+            <div className={styles.successCard}>
+              <div className={styles.successRow}>
+                <span>Login email</span>
+                <span>{submitted.email}</span>
+              </div>
+              <div className={styles.successRow}>
+                <span>Status</span>
+                <span>Pending review</span>
+              </div>
+            </div>
+            <Button href="/login" block>
+              Go to login
+            </Button>
+          </div>
+        </Card>
+      </FormShell>
+    );
+  }
+
+  return (
+    <FormShell
+      title="List your center on CertifyHub"
+      subtitle="Tell us about your center. Our admin team verifies every application."
+      maxWidth="560px"
+    >
+      <Card>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          {formError && <div className={styles.formError}>{formError}</div>}
+
+          <Field label="Center name" error={errors.name}>
+            <Input
+              value={form.name}
+              onChange={(e) => update("name", e.target.value)}
+              placeholder="e.g. Bright Academy"
+            />
+          </Field>
+
+          <div className={styles.row2}>
+            <Field label="Owner full name" error={errors.ownerName}>
+              <Input
+                value={form.ownerName}
+                onChange={(e) => update("ownerName", e.target.value)}
+                placeholder="Your full name"
+              />
+            </Field>
+            <Field label="Phone number" error={errors.phone}>
+              <Input
+                value={form.phone}
+                onChange={(e) => update("phone", e.target.value)}
+                placeholder="+91 98765 43210"
+              />
+            </Field>
+          </div>
+
+          <div className={styles.row2}>
+            <Field label="Login email" error={errors.email}>
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(e) => update("email", e.target.value)}
+                placeholder="you@center.com"
+              />
+            </Field>
+            <Field label="Set a password" error={errors.password} hint="Min. 6 characters">
+              <Input
+                type="password"
+                value={form.password}
+                onChange={(e) => update("password", e.target.value)}
+                placeholder="••••••••"
+              />
+            </Field>
+          </div>
+
+          <Field label="Location (city, state)" error={errors.location}>
+            <Input
+              value={form.location}
+              onChange={(e) => update("location", e.target.value)}
+              placeholder="e.g. Pune, Maharashtra"
+            />
+          </Field>
+
+          <Field label="Course / center type">
+            <Select value={form.courseType} onChange={(e) => update("courseType", e.target.value)}>
+              {COURSE_TYPES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </Select>
+          </Field>
+
+          <Field label="Business proof document" error={errors.file}>
+            <label className={styles.fileBox}>
+              <input
+                type="file"
+                hidden
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => setFileName(e.target.files?.[0]?.name || "")}
+              />
+              {fileName ? (
+                <div className={styles.fileName}>📎 {fileName}</div>
+              ) : (
+                <div className={styles.fileHint}>
+                  Click to upload GST certificate, shop license or trade license (PDF/JPG/PNG)
+                </div>
+              )}
+            </label>
+          </Field>
+
+          <Button type="submit" size="lg" block>
+            Submit for review
+          </Button>
+
+          <p className={styles.footNote}>
+            Already listed? <a href="/login">Log in instead</a>
+          </p>
+        </form>
+      </Card>
+    </FormShell>
+  );
+}
