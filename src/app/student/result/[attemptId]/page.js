@@ -4,10 +4,9 @@ import { use } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
-import CertificateDownloadButton from "@/components/certificate/CertificateDownloadButton";
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
-import { formatDate, formatDateTime } from "@/lib/ids";
+import { formatDateTime } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function ResultPage({ params }) {
@@ -55,8 +54,7 @@ export default function ResultPage({ params }) {
 
         {attempt.passed ? (
           <div className={styles.note}>
-            🏅 Congratulations! Your certificate is ready — download it below or get a copy from{" "}
-            {center?.name}.
+            🏅 Congratulations, you passed! Contact {center?.name} to get your certificate.
           </div>
         ) : (
           <div className={styles.note}>
@@ -66,21 +64,6 @@ export default function ResultPage({ params }) {
         )}
 
         <div className={styles.actions}>
-          {attempt.passed && (
-            <CertificateDownloadButton
-              size="lg"
-              data={{
-                studentName: session.name,
-                examTitle: exam.title,
-                subject: exam.subject,
-                centerName: center?.name || "",
-                score: attempt.score,
-                totalMarks: attempt.totalMarks,
-                dateStr: formatDate(attempt.submittedAt),
-                certId: attempt.id.replace("attempt_", "").toUpperCase(),
-              }}
-            />
-          )}
           <Button href="/student" variant="secondary" size="lg">
             Back to dashboard
           </Button>
