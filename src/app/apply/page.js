@@ -48,7 +48,6 @@ export default function ApplyPage() {
     if (form.password.length < 6) next.password = "Password must be at least 6 characters.";
     if (!form.phone.trim()) next.phone = "Phone number is required.";
     if (!form.location.trim()) next.location = "Location is required.";
-    if (!fileName) next.file = "Please attach a business proof document.";
     return next;
   }
 
@@ -171,7 +170,7 @@ export default function ApplyPage() {
             </Select>
           </Field>
 
-          <Field label="Business proof document" error={errors.file}>
+          <Field label="Business proof document" hint="Optional">
             <label className={styles.fileBox}>
               <input
                 type="file"
