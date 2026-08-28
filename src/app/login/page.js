@@ -87,14 +87,14 @@ function StudentLoginForm() {
   useDB();
   const centers = getApprovedCenters();
   const [centerId, setCenterId] = useState("");
-  const [studentCode, setStudentCode] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!centerId) return setError("Please select your center.");
-    const result = loginStudent(centerId, studentCode, password);
+    const result = loginStudent(centerId, phone, password);
     if (!result.ok) return setError(result.error);
     router.push("/student");
   }
@@ -112,8 +112,8 @@ function StudentLoginForm() {
           ))}
         </Select>
       </Field>
-      <Field label="Student ID">
-        <Input value={studentCode} onChange={(e) => setStudentCode(e.target.value)} placeholder="e.g. BA-1001" />
+      <Field label="Phone number">
+        <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98111 22334" />
       </Field>
       <Field label="Password">
         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
@@ -122,7 +122,7 @@ function StudentLoginForm() {
         Log in
       </Button>
       <div className={styles.demoBox}>
-        <b>Demo:</b> Bright Academy · BA-1001 / K7M2QX
+        <b>Demo:</b> Bright Academy · +91 98111 22334 / K7M2QX
       </div>
     </form>
   );

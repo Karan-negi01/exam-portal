@@ -11,7 +11,7 @@ const FAQS = [
   },
   {
     q: "How do students log in?",
-    a: "Once you add a student, the platform generates a unique student ID and password. Students log in by selecting your center and entering that ID and password.",
+    a: "Once you add a student, the platform generates a password and sends it to their phone via SMS. Students log in by selecting your center and entering their phone number and that password.",
   },
   {
     q: "Who creates the question papers?",

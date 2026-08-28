@@ -71,11 +71,11 @@ export function AuthProvider({ children }) {
   );
 
   const loginStudent = useCallback(
-    (centerId, studentCode, password) => {
+    (centerId, phone, password) => {
       const center = getCenterById(centerId);
       if (!center) return { ok: false, error: "Please select your center." };
-      const student = findStudentLogin(centerId, studentCode, password);
-      if (!student) return { ok: false, error: "Invalid student ID or password." };
+      const student = findStudentLogin(centerId, phone, password);
+      if (!student) return { ok: false, error: "Invalid phone number or password." };
       persist({
         role: "student",
         id: student.id,

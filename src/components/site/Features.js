@@ -10,8 +10,8 @@ const FEATURES = [
   {
     icon: "🔑",
     tone: "iconAmber",
-    title: "Individual student logins",
-    text: "Each enrolled student gets a unique student ID and password issued automatically the moment they're added.",
+    title: "Phone-based student logins",
+    text: "Each enrolled student logs in with their own phone number and an auto-generated password, sent to them the moment they're added.",
   },
   {
     icon: "📚",

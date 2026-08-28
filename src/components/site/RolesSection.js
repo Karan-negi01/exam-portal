@@ -32,7 +32,7 @@ const ROLES = [
     tone: "badgeStudent",
     title: "Enrolled student",
     points: [
-      "Log in with your center, student ID and password",
+      "Log in with your center, phone number and password",
       "Take timed exams from your dashboard",
       "See your score and pass/fail result instantly",
     ],

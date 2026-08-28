@@ -16,6 +16,13 @@ export function generatePassword(length = 6) {
   return out;
 }
 
+export function normalizePhone(phone) {
+  // Compare by the last 10 digits so "+91 98111 22334" and "9811122334"
+  // (with or without the country code / spacing) match the same student.
+  const digits = (phone || "").replace(/\D/g, "");
+  return digits.slice(-10);
+}
+
 export function centerPrefix(name) {
   const letters = (name || "").replace(/[^a-zA-Z]/g, "").toUpperCase();
   return letters.slice(0, 2) || "CT";

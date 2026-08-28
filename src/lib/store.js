@@ -1,4 +1,4 @@
-import { generateId, generatePassword, centerPrefix } from "./ids";
+import { generateId, generatePassword, centerPrefix, normalizePhone } from "./ids";
 import { computeScore } from "./scoring";
 import { PRICE_PER_SEAT, oneYearFromNow, isQuotaExpired } from "./pricing";
 import { sampleArray } from "./shuffle";
@@ -497,6 +497,12 @@ export function addStudent(centerId, { name, phone }) {
   const center = getCenterById(centerId);
   const existing = state.students.filter((s) => s.centerId === centerId);
 
+  if (!phone || !normalizePhone(phone)) {
+    return { ok: false, error: "A phone number is required — students log in with it." };
+  }
+  if (existing.some((s) => normalizePhone(s.phone) === normalizePhone(phone))) {
+    return { ok: false, error: "A student with this phone number is already enrolled." };
+  }
   if (isQuotaExpired(center.quota)) {
     return { ok: false, error: "Your seat quota has expired. Buy more seats to keep enrolling students." };
   }
@@ -510,7 +516,7 @@ export function addStudent(centerId, { name, phone }) {
     centerId,
     studentCode: `${center.code}-${nextNumber}`,
     name,
-    phone: phone || "",
+    phone,
     password: generatePassword(),
     createdAt: new Date().toISOString(),
   };
@@ -530,11 +536,11 @@ export function getStudentById(id) {
   return state.students.find((s) => s.id === id);
 }
 
-export function findStudentLogin(centerId, studentCode, password) {
+export function findStudentLogin(centerId, phone, password) {
   return state.students.find(
     (s) =>
       s.centerId === centerId &&
-      s.studentCode.toLowerCase() === (studentCode || "").toLowerCase() &&
+      normalizePhone(s.phone) === normalizePhone(phone) &&
       s.password === password
   );
 }

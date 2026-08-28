@@ -14,6 +14,7 @@ import BuySeatsModal from "@/components/center/BuySeatsModal";
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
 import { addStudent, removeStudent } from "@/lib/store";
+import { sendStudentCredentialsSms } from "@/lib/notify";
 import { seatsRemaining } from "@/lib/pricing";
 import { formatDate, getInitials } from "@/lib/ids";
 import styles from "./page.module.css";
@@ -37,7 +38,7 @@ export default function CenterStudentsPage() {
       roleTag="Center owner"
       userMeta={session?.name}
       title="Students"
-      subtitle="Every enrolled student gets an individual login ID and password."
+      subtitle="Every enrolled student logs in with their phone number and a password."
       actions={
         <Button size="sm" onClick={() => setModalOpen(true)}>
           + Add student
@@ -66,8 +67,9 @@ export default function CenterStudentsPage() {
       {justAdded?.studentCode && (
         <div className={styles.successBanner}>
           <span>
-            ✓ {justAdded.name} added — Student ID <b>{justAdded.studentCode}</b>, password{" "}
-            <b>{justAdded.password}</b>. Share these with your student.
+            ✓ {justAdded.name} added — login is <b>{justAdded.phone}</b> + password{" "}
+            <b>{justAdded.password}</b>.{" "}
+            {justAdded.smsSent ? "Sent to their phone via SMS (demo)." : ""}
           </span>
           <Button size="sm" variant="ghost" onClick={() => setJustAdded(null)}>
             Dismiss
@@ -94,7 +96,7 @@ export default function CenterStudentsPage() {
                 <tr>
                   <th>Student ID</th>
                   <th>Name</th>
-                  <th>Phone</th>
+                  <th>Phone (login)</th>
                   <th>Password</th>
                   <th>Enrolled</th>
                   <th></th>
@@ -110,7 +112,7 @@ export default function CenterStudentsPage() {
                         {s.name}
                       </div>
                     </td>
-                    <td>{s.phone || "—"}</td>
+                    <td>{s.phone}</td>
                     <td>
                       <span className={styles.password}>{s.password}</span>
                     </td>
@@ -194,9 +196,11 @@ function AddStudentModal({ centerId, remainingSeats, onClose, onAdded, onBuySeat
   function handleSubmit(e) {
     e.preventDefault();
     if (!name.trim()) return setError("Student name is required.");
+    if (!phone.trim()) return setError("Phone number is required — students log in with it.");
     const result = addStudent(centerId, { name: name.trim(), phone: phone.trim() });
     if (!result.ok) return setError(result.error);
-    onAdded(result.student);
+    const sms = sendStudentCredentialsSms(result.student);
+    onAdded({ ...result.student, smsSent: sms.ok });
   }
 
   return (
@@ -206,7 +210,7 @@ function AddStudentModal({ centerId, remainingSeats, onClose, onAdded, onBuySeat
         <Field label="Full name">
           <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Student's full name" autoFocus />
         </Field>
-        <Field label="Phone number" hint="Optional">
+        <Field label="Phone number" hint="Required — this is how they'll log in">
           <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" />
         </Field>
         <Button type="submit" block>
