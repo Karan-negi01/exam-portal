@@ -5,7 +5,7 @@ const FEATURES = [
     icon: "🛡️",
     tone: "iconIndigo",
     title: "Verified centers only",
-    text: "Every center is reviewed by our admin team — business proof, location and course type checked before going live.",
+    text: "Every center is reviewed by our admin team — PAN card, location and course types checked before going live.",
   },
   {
     icon: "🔑",
@@ -14,10 +14,10 @@ const FEATURES = [
     text: "Each enrolled student gets a unique student ID and password issued automatically the moment they're added.",
   },
   {
-    icon: "📝",
+    icon: "📚",
     tone: "iconGreen",
-    title: "Type or upload MCQs",
-    text: "Build question papers by typing them directly into the platform, organised by subject — no separate software needed.",
+    title: "Ready-made question papers",
+    text: "CertifyHub prepares the MCQ question papers for every subject — centers just pick one, set a date, and assign students.",
   },
   {
     icon: "⏱️",

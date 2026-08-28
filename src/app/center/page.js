@@ -10,6 +10,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
+import { seatsRemaining } from "@/lib/pricing";
 import styles from "./page.module.css";
 
 export default function CenterOverviewPage() {
@@ -17,12 +18,14 @@ export default function CenterOverviewPage() {
   const db = useDB();
   const centerId = session?.centerId;
 
+  const center = db.centers.find((c) => c.id === centerId);
   const students = db.students.filter((s) => s.centerId === centerId);
   const exams = db.exams.filter((e) => e.centerId === centerId);
   const examIds = new Set(exams.map((e) => e.id));
   const attempts = db.attempts.filter((a) => examIds.has(a.examId));
   const passed = attempts.filter((a) => a.passed).length;
   const passRate = attempts.length ? Math.round((passed / attempts.length) * 100) : 0;
+  const remaining = center ? seatsRemaining(center.quota, students.length) : 0;
 
   return (
     <DashboardShell
@@ -33,14 +36,14 @@ export default function CenterOverviewPage() {
       subtitle="Track your students, exams and results at a glance."
       actions={
         <Button href="/center/exams/new" size="sm">
-          + Create exam
+          + Schedule exam
         </Button>
       }
     >
       <div className={styles.stats}>
-        <StatCard tone="blue" icon="👥" value={students.length} label="Students enrolled" />
-        <StatCard tone="indigo" icon="📝" value={exams.length} label="Exams created" />
-        <StatCard tone="teal" icon="🧾" value={attempts.length} label="Exams attempted" />
+        <StatCard tone="blue" icon="👥" value={`${students.length}/${center?.quota?.seats ?? 0}`} label="Seats used" />
+        <StatCard tone="green" icon="🎟️" value={remaining} label="Seats remaining" />
+        <StatCard tone="indigo" icon="📝" value={exams.length} label="Exams scheduled" />
         <StatCard tone="amber" icon="🏅" value={`${passRate}%`} label="Pass rate" />
       </div>
 
@@ -54,11 +57,11 @@ export default function CenterOverviewPage() {
           {exams.length === 0 ? (
             <EmptyState
               icon="📝"
-              title="No exams yet"
-              description="Create your first MCQ exam to start testing students."
+              title="No exams scheduled yet"
+              description="Pick a question paper and a date to schedule your first exam."
               action={
                 <Button href="/center/exams/new" size="sm">
-                  Create an exam
+                  Schedule an exam
                 </Button>
               }
             />

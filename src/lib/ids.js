@@ -21,6 +21,16 @@ export function centerPrefix(name) {
   return letters.slice(0, 2) || "CT";
 }
 
+export function formatDateOnly(dateStr) {
+  if (!dateStr) return "-";
+  const [year, month, day] = dateStr.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
 export function formatDate(iso) {
   if (!iso) return "-";
   return new Date(iso).toLocaleDateString("en-IN", {

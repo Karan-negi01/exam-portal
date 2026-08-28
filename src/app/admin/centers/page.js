@@ -58,7 +58,8 @@ export default function AdminCentersPage() {
                 <tr>
                   <th>Center</th>
                   <th>Location</th>
-                  <th>Course type</th>
+                  <th>Course types</th>
+                  <th>Seat Pack</th>
                   <th>Applied</th>
                   <th>Status</th>
                   <th></th>
@@ -72,7 +73,8 @@ export default function AdminCentersPage() {
                       <div className={styles.subCell}>{c.ownerName}</div>
                     </td>
                     <td>{c.location}</td>
-                    <td>{c.courseType}</td>
+                    <td>{c.courseTypes?.join(", ")}</td>
+                    <td>{c.quota?.seats} seats</td>
                     <td>{formatDate(c.createdAt)}</td>
                     <td>
                       <Badge tone={STATUS_TONE[c.status]}>{c.status}</Badge>

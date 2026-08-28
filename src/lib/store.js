@@ -1,8 +1,9 @@
 import { generateId, generatePassword, centerPrefix } from "./ids";
 import { computeScore } from "./scoring";
+import { PRICE_PER_SEAT, oneYearFromNow, isQuotaExpired } from "./pricing";
 
 const STORAGE_KEY = "examplatform:db";
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 
 const listeners = new Set();
 
@@ -164,11 +165,17 @@ function buildSeed() {
       password: "center123",
       phone: "+91 98765 43210",
       location: "Pune, Maharashtra",
-      courseType: "Computer Typing & Tally",
-      businessProofName: "gst_certificate.pdf",
+      courseTypes: ["Computer Typing & Tally", "Accounting & Taxation"],
+      panCardName: "pan_card.pdf",
       status: "approved",
       createdAt: daysAgo(40),
       reviewedAt: daysAgo(39),
+      quota: {
+        seats: 10,
+        pricePerSeat: PRICE_PER_SEAT,
+        purchasedAt: daysAgo(40),
+        expiresAt: oneYearFromNow(daysAgo(40)),
+      },
     },
     {
       id: "center_2",
@@ -179,11 +186,17 @@ function buildSeed() {
       password: "center123",
       phone: "+91 90000 11122",
       location: "Lucknow, Uttar Pradesh",
-      courseType: "Spoken English & Soft Skills",
-      businessProofName: "shop_license.jpg",
+      courseTypes: ["Spoken English & Soft Skills"],
+      panCardName: null,
       status: "pending",
       createdAt: daysAgo(2),
       reviewedAt: null,
+      quota: {
+        seats: 5,
+        pricePerSeat: PRICE_PER_SEAT,
+        purchasedAt: daysAgo(2),
+        expiresAt: oneYearFromNow(daysAgo(2)),
+      },
     },
     {
       id: "center_3",
@@ -194,11 +207,17 @@ function buildSeed() {
       password: "center123",
       phone: "+91 89999 22233",
       location: "Ahmedabad, Gujarat",
-      courseType: "Basic Computer Course (CCC)",
-      businessProofName: "trade_license.pdf",
+      courseTypes: ["Basic Computer Course (CCC)", "Data Entry Operator"],
+      panCardName: "pan_card.jpg",
       status: "approved",
       createdAt: daysAgo(70),
       reviewedAt: daysAgo(68),
+      quota: {
+        seats: 5,
+        pricePerSeat: PRICE_PER_SEAT,
+        purchasedAt: daysAgo(70),
+        expiresAt: oneYearFromNow(daysAgo(70)),
+      },
     },
   ];
 
@@ -241,29 +260,57 @@ function buildSeed() {
     },
   ];
 
-  const exam1 = {
-    id: "exam_1",
-    centerId: "center_1",
+  const paperTally = {
+    id: "paper_tally",
     title: "Tally ERP 9 Foundation",
     subject: "Accounting Software",
     durationMinutes: 30,
     passingMarks: 6,
+    questions: tallyQuestions(),
+    createdAt: daysAgo(60),
+  };
+
+  const paperExcel = {
+    id: "paper_excel",
+    title: "Advanced MS Excel",
+    subject: "MS Excel",
+    durationMinutes: 45,
+    passingMarks: 7,
+    questions: excelQuestions(),
+    createdAt: daysAgo(55),
+  };
+
+  const questionPapers = [paperTally, paperExcel];
+
+  const isoDate = (n) => daysAgo(n).slice(0, 10);
+
+  const exam1 = {
+    id: "exam_1",
+    centerId: "center_1",
+    questionPaperId: paperTally.id,
+    title: paperTally.title,
+    subject: paperTally.subject,
+    date: isoDate(20),
+    durationMinutes: paperTally.durationMinutes,
+    passingMarks: paperTally.passingMarks,
     status: "published",
     assignedStudentIds: ["student_1", "student_2", "student_3"],
-    questions: tallyQuestions(),
+    questions: paperTally.questions,
     createdAt: daysAgo(25),
   };
 
   const exam2 = {
     id: "exam_2",
     centerId: "center_1",
-    title: "Advanced MS Excel",
-    subject: "MS Excel",
-    durationMinutes: 45,
-    passingMarks: 7,
+    questionPaperId: paperExcel.id,
+    title: paperExcel.title,
+    subject: paperExcel.subject,
+    date: isoDate(-5),
+    durationMinutes: paperExcel.durationMinutes,
+    passingMarks: paperExcel.passingMarks,
     status: "draft",
     assignedStudentIds: [],
-    questions: excelQuestions(),
+    questions: paperExcel.questions,
     createdAt: daysAgo(3),
   };
 
@@ -298,6 +345,7 @@ function buildSeed() {
     version: STORAGE_VERSION,
     centers,
     students,
+    questionPapers,
     exams,
     attempts: [attempt1, attempt2],
   };
@@ -364,6 +412,7 @@ export function getServerSnapshot() {
 // ---------- Centers ----------
 
 export function applyForCenter(data) {
+  const now = new Date().toISOString();
   const center = {
     id: generateId("center"),
     code: centerPrefix(data.name),
@@ -373,14 +422,40 @@ export function applyForCenter(data) {
     password: data.password,
     phone: data.phone,
     location: data.location,
-    courseType: data.courseType,
-    businessProofName: data.businessProofName || null,
+    courseTypes: data.courseTypes || [],
+    panCardName: data.panCardName || null,
     status: "pending",
-    createdAt: new Date().toISOString(),
+    createdAt: now,
     reviewedAt: null,
+    quota: {
+      seats: data.seats,
+      pricePerSeat: PRICE_PER_SEAT,
+      purchasedAt: now,
+      expiresAt: oneYearFromNow(now),
+    },
   };
   setState((s) => ({ ...s, centers: [center, ...s.centers] }));
   return center;
+}
+
+export function addSeats(centerId, additionalSeats) {
+  const now = new Date().toISOString();
+  setState((s) => ({
+    ...s,
+    centers: s.centers.map((c) => {
+      if (c.id !== centerId) return c;
+      const prevSeats = c.quota?.seats || 0;
+      return {
+        ...c,
+        quota: {
+          seats: prevSeats + additionalSeats,
+          pricePerSeat: PRICE_PER_SEAT,
+          purchasedAt: now,
+          expiresAt: oneYearFromNow(now),
+        },
+      };
+    }),
+  }));
 }
 
 export function approveCenter(id) {
@@ -418,6 +493,14 @@ export function getApprovedCenters() {
 export function addStudent(centerId, { name, phone }) {
   const center = getCenterById(centerId);
   const existing = state.students.filter((s) => s.centerId === centerId);
+
+  if (isQuotaExpired(center.quota)) {
+    return { ok: false, error: "Your seat quota has expired. Buy more seats to keep enrolling students." };
+  }
+  if (existing.length >= center.quota.seats) {
+    return { ok: false, error: "You've used all your purchased seats. Buy more seats to add this student." };
+  }
+
   const nextNumber = 1001 + existing.length;
   const student = {
     id: generateId("student"),
@@ -429,7 +512,7 @@ export function addStudent(centerId, { name, phone }) {
     createdAt: new Date().toISOString(),
   };
   setState((s) => ({ ...s, students: [...s.students, student] }));
-  return student;
+  return { ok: true, student };
 }
 
 export function removeStudent(id) {
@@ -453,19 +536,50 @@ export function findStudentLogin(centerId, studentCode, password) {
   );
 }
 
-// ---------- Exams ----------
+// ---------- Question papers (created by the platform, not the center) ----------
 
-export function createExam(centerId, { title, subject, durationMinutes, passingMarks, questions }) {
-  const exam = {
-    id: generateId("exam"),
-    centerId,
+export function createQuestionPaper({ title, subject, durationMinutes, passingMarks, questions }) {
+  const paper = {
+    id: generateId("paper"),
     title,
     subject,
     durationMinutes,
     passingMarks,
+    questions: questions.map((q) => ({ id: generateId("q"), ...q })),
+    createdAt: new Date().toISOString(),
+  };
+  setState((s) => ({ ...s, questionPapers: [paper, ...s.questionPapers] }));
+  return paper;
+}
+
+export function deleteQuestionPaper(id) {
+  setState((s) => ({ ...s, questionPapers: s.questionPapers.filter((p) => p.id !== id) }));
+}
+
+export function getQuestionPapers() {
+  return state.questionPapers;
+}
+
+export function getQuestionPaperById(id) {
+  return state.questionPapers.find((p) => p.id === id);
+}
+
+// ---------- Exams (a center scheduling one of the platform's question papers) ----------
+
+export function scheduleExam(centerId, { questionPaperId, date }) {
+  const paper = getQuestionPaperById(questionPaperId);
+  const exam = {
+    id: generateId("exam"),
+    centerId,
+    questionPaperId,
+    title: paper.title,
+    subject: paper.subject,
+    date,
+    durationMinutes: paper.durationMinutes,
+    passingMarks: paper.passingMarks,
     status: "draft",
     assignedStudentIds: [],
-    questions: questions.map((q) => ({ id: generateId("q"), ...q })),
+    questions: paper.questions,
     createdAt: new Date().toISOString(),
   };
   setState((s) => ({ ...s, exams: [exam, ...s.exams] }));

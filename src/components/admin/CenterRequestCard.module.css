@@ -37,6 +37,22 @@
   gap: 5px;
 }
 
+.courseTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.courseTag {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  background: var(--color-surface-alt);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
 .proof {
   display: inline-flex;
   align-items: center;

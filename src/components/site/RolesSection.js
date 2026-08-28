@@ -7,9 +7,9 @@ const ROLES = [
     tone: "badgeAdmin",
     title: "Platform admin",
     points: [
-      "Review new center applications and business proof",
+      "Review new center applications and PAN card details",
       "Approve or reject centers before they go live",
-      "Oversee every center, student and exam on the platform",
+      "Build the official MCQ question papers centers schedule from",
     ],
     link: "/login",
     linkLabel: "Admin login →",
@@ -19,9 +19,9 @@ const ROLES = [
     tone: "badgeCenter",
     title: "Training center",
     points: [
-      "List your center and get verified by the admin",
+      "List your center, choose a Seat Pack, and get verified",
       "Enroll students — each gets their own ID and password",
-      "Create timed MCQ exams and set passing marks",
+      "Schedule exams from CertifyHub's ready-made question papers",
       "Download certificates for every student who passes",
     ],
     link: "/apply",

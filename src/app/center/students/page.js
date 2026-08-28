@@ -9,9 +9,12 @@ import Modal from "@/components/ui/Modal";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import EmptyState from "@/components/ui/EmptyState";
 import { Field, Input } from "@/components/ui/Field";
+import SeatStatusCard from "@/components/center/SeatStatusCard";
+import BuySeatsModal from "@/components/center/BuySeatsModal";
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
 import { addStudent, removeStudent } from "@/lib/store";
+import { seatsRemaining } from "@/lib/pricing";
 import { formatDate, getInitials } from "@/lib/ids";
 import styles from "./page.module.css";
 
@@ -19,9 +22,12 @@ export default function CenterStudentsPage() {
   const { session } = useAuth();
   const db = useDB();
   const centerId = session?.centerId;
+  const center = db.centers.find((c) => c.id === centerId);
   const students = db.students.filter((s) => s.centerId === centerId);
+  const remaining = center ? seatsRemaining(center.quota, students.length) : 0;
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [buyingSeats, setBuyingSeats] = useState(false);
   const [justAdded, setJustAdded] = useState(null);
   const [removingStudent, setRemovingStudent] = useState(null);
 
@@ -38,7 +44,26 @@ export default function CenterStudentsPage() {
         </Button>
       }
     >
-      {justAdded && (
+      {center && (
+        <SeatStatusCard
+          center={center}
+          usedSeats={students.length}
+          onPurchased={(seats) =>
+            setJustAdded({ seatsPurchased: seats })
+          }
+        />
+      )}
+
+      {justAdded?.seatsPurchased && (
+        <div className={styles.successBanner}>
+          <span>✓ {justAdded.seatsPurchased} seats added to your quota.</span>
+          <Button size="sm" variant="ghost" onClick={() => setJustAdded(null)}>
+            Dismiss
+          </Button>
+        </div>
+      )}
+
+      {justAdded?.studentCode && (
         <div className={styles.successBanner}>
           <span>
             ✓ {justAdded.name} added — Student ID <b>{justAdded.studentCode}</b>, password{" "}
@@ -106,10 +131,26 @@ export default function CenterStudentsPage() {
       {modalOpen && (
         <AddStudentModal
           centerId={centerId}
+          remainingSeats={remaining}
           onClose={() => setModalOpen(false)}
           onAdded={(student) => {
             setJustAdded(student);
             setModalOpen(false);
+          }}
+          onBuySeats={() => {
+            setModalOpen(false);
+            setBuyingSeats(true);
+          }}
+        />
+      )}
+
+      {buyingSeats && (
+        <BuySeatsModal
+          centerId={centerId}
+          onClose={() => setBuyingSeats(false)}
+          onPurchased={(seats) => {
+            setBuyingSeats(false);
+            setJustAdded({ seatsPurchased: seats });
           }}
         />
       )}
@@ -131,16 +172,31 @@ export default function CenterStudentsPage() {
   );
 }
 
-function AddStudentModal({ centerId, onClose, onAdded }) {
+function AddStudentModal({ centerId, remainingSeats, onClose, onAdded, onBuySeats }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState("");
 
+  if (remainingSeats <= 0) {
+    return (
+      <Modal title="No seats remaining" onClose={onClose}>
+        <p style={{ color: "var(--color-ink-soft)", fontSize: "0.92rem", marginBottom: 20, lineHeight: 1.6 }}>
+          You&apos;ve used every seat in your current Seat Pack. Buy another Seat Pack to enroll
+          more students.
+        </p>
+        <Button block onClick={onBuySeats}>
+          Buy a Seat Pack
+        </Button>
+      </Modal>
+    );
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
     if (!name.trim()) return setError("Student name is required.");
-    const student = addStudent(centerId, { name: name.trim(), phone: phone.trim() });
-    onAdded(student);
+    const result = addStudent(centerId, { name: name.trim(), phone: phone.trim() });
+    if (!result.ok) return setError(result.error);
+    onAdded(result.student);
   }
 
   return (

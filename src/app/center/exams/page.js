@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
+import { formatDateOnly } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function CenterExamsPage() {
@@ -22,10 +23,10 @@ export default function CenterExamsPage() {
       roleTag="Center owner"
       userMeta={session?.name}
       title="Exams"
-      subtitle="Create MCQ exams, set the timer and passing marks, and track results."
+      subtitle="Schedule exams from CertifyHub's question papers and assign your students."
       actions={
         <Button href="/center/exams/new" size="sm">
-          + Create exam
+          + Schedule exam
         </Button>
       }
     >
@@ -33,11 +34,11 @@ export default function CenterExamsPage() {
         <Card>
           <EmptyState
             icon="📝"
-            title="No exams yet"
-            description="Build your first MCQ exam — type in questions, set a timer and passing marks."
+            title="No exams scheduled yet"
+            description="Pick a question paper and a date to schedule your first exam."
             action={
               <Button size="sm" href="/center/exams/new">
-                Create an exam
+                Schedule an exam
               </Button>
             }
           />
@@ -56,6 +57,7 @@ export default function CenterExamsPage() {
                   <Badge tone={e.status === "published" ? "success" : "neutral"}>{e.status}</Badge>
                 </div>
                 <div className={styles.metaRow}>
+                  <span>📅 {formatDateOnly(e.date)}</span>
                   <span>❓ {e.questions.length} questions</span>
                   <span>⏱ {e.durationMinutes} min</span>
                   <span>🎯 Pass {e.passingMarks}/{e.questions.length}</span>

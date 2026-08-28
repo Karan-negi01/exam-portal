@@ -3,19 +3,19 @@ import styles from "./FAQSection.module.css";
 const FAQS = [
   {
     q: "Is my center verified before it goes live?",
-    a: "Yes. Every application is reviewed by our admin team — we check your business proof, location and course type before your center is published and can enroll students.",
+    a: "Yes. Every application is reviewed by our admin team — we check your PAN card, location and course types before your center is published and can enroll students.",
+  },
+  {
+    q: "How does the Seat Pack pricing work?",
+    a: "You pay ₹200 per student when you list your center, choosing how many seats you need. That Seat Pack is valid for 1 year — unused seats expire after that, but you can buy another Seat Pack anytime to keep enrolling students.",
   },
   {
     q: "How do students log in?",
     a: "Once you add a student, the platform generates a unique student ID and password. Students log in by selecting your center and entering that ID and password.",
   },
   {
-    q: "Can I upload questions or type them in myself?",
-    a: "Both. You can type MCQ questions directly into the exam builder, organised by subject, with four options and a marked correct answer for each.",
-  },
-  {
-    q: "Who sets the exam timer and passing marks?",
-    a: "You do. When creating an exam, you choose the duration in minutes and the minimum marks needed to pass — the platform grades every attempt against that automatically.",
+    q: "Who creates the question papers?",
+    a: "CertifyHub does. Our team prepares MCQ question papers for every subject, each with its own timer and passing marks already set. Centers simply pick a paper, choose an exam date, and assign it to their students.",
   },
   {
     q: "How are certificates generated?",

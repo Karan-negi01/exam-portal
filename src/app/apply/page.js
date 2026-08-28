@@ -4,9 +4,13 @@ import { useState } from "react";
 import FormShell from "@/components/site/FormShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { Field, Input, Select } from "@/components/ui/Field";
+import { Field, Input } from "@/components/ui/Field";
 import { applyForCenter, findCenterByEmail } from "@/lib/store";
+import { PRICE_PER_SEAT, formatRupees } from "@/lib/pricing";
+import { formatDate } from "@/lib/ids";
 import styles from "./page.module.css";
+
+const OTHER_LABEL = "Other";
 
 const COURSE_TYPES = [
   "Computer Typing & Tally",
@@ -16,7 +20,7 @@ const COURSE_TYPES = [
   "Beautician & Cosmetology",
   "Data Entry Operator",
   "Accounting & Taxation",
-  "Other Vocational Course",
+  OTHER_LABEL,
 ];
 
 const EMPTY = {
@@ -26,7 +30,9 @@ const EMPTY = {
   password: "",
   phone: "",
   location: "",
-  courseType: COURSE_TYPES[0],
+  courseTypes: [],
+  otherCourseType: "",
+  seats: 10,
 };
 
 export default function ApplyPage() {
@@ -34,11 +40,23 @@ export default function ApplyPage() {
   const [fileName, setFileName] = useState("");
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
+  const [paying, setPaying] = useState(false);
   const [submitted, setSubmitted] = useState(null);
 
   function update(key, value) {
     setForm((f) => ({ ...f, [key]: value }));
   }
+
+  function toggleCourseType(type) {
+    setForm((f) => ({
+      ...f,
+      courseTypes: f.courseTypes.includes(type)
+        ? f.courseTypes.filter((t) => t !== type)
+        : [...f.courseTypes, type],
+    }));
+  }
+
+  const amount = Math.max(0, Number(form.seats) || 0) * PRICE_PER_SEAT;
 
   function validate() {
     const next = {};
@@ -48,6 +66,11 @@ export default function ApplyPage() {
     if (form.password.length < 6) next.password = "Password must be at least 6 characters.";
     if (!form.phone.trim()) next.phone = "Phone number is required.";
     if (!form.location.trim()) next.location = "Location is required.";
+    if (form.courseTypes.length === 0) next.courseTypes = "Select at least one course type.";
+    if (form.courseTypes.includes(OTHER_LABEL) && !form.otherCourseType.trim()) {
+      next.otherCourseType = "Tell us what kind of center this is.";
+    }
+    if (!form.seats || form.seats < 1) next.seats = "Choose at least 1 seat.";
     return next;
   }
 
@@ -63,8 +86,22 @@ export default function ApplyPage() {
       return;
     }
 
-    const center = applyForCenter({ ...form, businessProofName: fileName });
-    setSubmitted(center);
+    const finalCourseTypes = form.courseTypes.map((c) =>
+      c === OTHER_LABEL ? form.otherCourseType.trim() : c
+    );
+
+    setPaying(true);
+    // Razorpay isn't wired up yet — this simulates a successful payment for the demo.
+    setTimeout(() => {
+      const center = applyForCenter({
+        ...form,
+        courseTypes: finalCourseTypes,
+        seats: Number(form.seats),
+        panCardName: fileName || null,
+      });
+      setPaying(false);
+      setSubmitted(center);
+    }, 700);
   }
 
   if (submitted) {
@@ -83,6 +120,16 @@ export default function ApplyPage() {
               <div className={styles.successRow}>
                 <span>Login email</span>
                 <span>{submitted.email}</span>
+              </div>
+              <div className={styles.successRow}>
+                <span>Seat Pack</span>
+                <span>
+                  {submitted.quota.seats} seats · {formatRupees(submitted.quota.seats * PRICE_PER_SEAT)}
+                </span>
+              </div>
+              <div className={styles.successRow}>
+                <span>Valid till</span>
+                <span>{formatDate(submitted.quota.expiresAt)}</span>
               </div>
               <div className={styles.successRow}>
                 <span>Status</span>
@@ -160,17 +207,33 @@ export default function ApplyPage() {
             />
           </Field>
 
-          <Field label="Course / center type">
-            <Select value={form.courseType} onChange={(e) => update("courseType", e.target.value)}>
+          <Field label="Course / center types" error={errors.courseTypes} hint="Select all that apply">
+            <div className={styles.chipGrid}>
               {COURSE_TYPES.map((c) => (
-                <option key={c} value={c}>
+                <button
+                  type="button"
+                  key={c}
+                  className={`${styles.chip} ${form.courseTypes.includes(c) ? styles.chipActive : ""}`}
+                  onClick={() => toggleCourseType(c)}
+                >
                   {c}
-                </option>
+                </button>
               ))}
-            </Select>
+            </div>
           </Field>
 
-          <Field label="Business proof document" hint="Optional">
+          {form.courseTypes.includes(OTHER_LABEL) && (
+            <Field label="What kind of center is it?" error={errors.otherCourseType}>
+              <Input
+                value={form.otherCourseType}
+                onChange={(e) => update("otherCourseType", e.target.value)}
+                placeholder="e.g. Yoga & Wellness Training"
+                autoFocus
+              />
+            </Field>
+          )}
+
+          <Field label="PAN card (business proof)" hint="Optional for now">
             <label className={styles.fileBox}>
               <input
                 type="file"
@@ -181,15 +244,29 @@ export default function ApplyPage() {
               {fileName ? (
                 <div className={styles.fileName}>📎 {fileName}</div>
               ) : (
-                <div className={styles.fileHint}>
-                  Click to upload GST certificate, shop license or trade license (PDF/JPG/PNG)
-                </div>
+                <div className={styles.fileHint}>Click to upload your PAN card (PDF/JPG/PNG)</div>
               )}
             </label>
           </Field>
 
-          <Button type="submit" size="lg" block>
-            Submit for review
+          <Field label="Seat Pack — how many students?" error={errors.seats} hint="₹200 per student · valid for 1 year">
+            <Input
+              type="number"
+              min="1"
+              value={form.seats}
+              onChange={(e) => update("seats", e.target.value)}
+            />
+          </Field>
+
+          <div className={styles.priceBox}>
+            <span className={styles.priceLabel}>
+              {form.seats || 0} seats × {formatRupees(PRICE_PER_SEAT)}
+            </span>
+            <span className={styles.priceValue}>{formatRupees(amount)}</span>
+          </div>
+
+          <Button type="submit" size="lg" block disabled={paying}>
+            {paying ? "Processing payment…" : `Submit & pay ${formatRupees(amount)} via Razorpay (demo)`}
           </Button>
 
           <p className={styles.footNote}>

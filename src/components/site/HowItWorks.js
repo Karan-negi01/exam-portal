@@ -3,13 +3,13 @@ import styles from "./HowItWorks.module.css";
 const STEPS = [
   {
     tag: "Center owner + Admin",
-    title: "Apply & get verified",
-    desc: "Submit your center's name, business proof, location and course type. Our admin team reviews and approves genuine centers before they go live on the platform.",
+    title: "Apply, choose a Seat Pack & get verified",
+    desc: "Submit your center's details and PAN card, pick how many student seats you need, and our admin team reviews your application before you go live.",
   },
   {
     tag: "Center owner",
-    title: "Enroll students & build exams",
-    desc: "Add students to get them individual login IDs and passwords. Create MCQ question papers by uploading or typing them in — set the timer and passing marks yourself.",
+    title: "Schedule exams & enroll students",
+    desc: "Add students to get them individual login IDs and passwords. Pick one of CertifyHub's ready-made question papers, set a date, and assign it to your students.",
   },
   {
     tag: "Student",

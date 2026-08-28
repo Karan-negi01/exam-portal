@@ -14,7 +14,7 @@ import CertificateDownloadButton from "@/components/certificate/CertificateDownl
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
 import { publishExam, deleteExam } from "@/lib/store";
-import { formatDate, formatDateTime, getInitials } from "@/lib/ids";
+import { formatDate, formatDateOnly, formatDateTime, getInitials } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function ExamDetailPage({ params }) {
@@ -77,7 +77,7 @@ export default function ExamDetailPage({ params }) {
           label="Passing marks"
           compact
         />
-        <StatCard tone="teal" icon="📅" value={formatDate(exam.createdAt)} label="Created" compact />
+        <StatCard tone="teal" icon="📅" value={formatDateOnly(exam.date)} label="Scheduled date" compact />
       </div>
 
       {exam.status === "draft" ? (
