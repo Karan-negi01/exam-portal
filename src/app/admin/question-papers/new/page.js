@@ -21,6 +21,7 @@ export default function NewQuestionPaperPage() {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [durationMinutes, setDurationMinutes] = useState(30);
+  const [questionsPerExam, setQuestionsPerExam] = useState("");
   const [passingMarks, setPassingMarks] = useState("");
   const [questions, setQuestions] = useState([emptyQuestion()]);
   const [error, setError] = useState("");
@@ -41,9 +42,14 @@ export default function NewQuestionPaperPage() {
     if (!title.trim()) return "Give the paper a title.";
     if (!subject.trim()) return "Enter a subject for the paper.";
     if (!durationMinutes || durationMinutes < 1) return "Set a valid timer duration.";
+    const perExam = Number(questionsPerExam);
+    if (!questionsPerExam || perExam < 1) return "Enter how many questions each exam should draw.";
+    if (perExam > questions.length) {
+      return "Questions per exam can't exceed the number of questions in the bank.";
+    }
     const passing = Number(passingMarks);
     if (!passingMarks || passing < 1) return "Enter the passing marks.";
-    if (passing > questions.length) return "Passing marks can't exceed the number of questions.";
+    if (passing > perExam) return "Passing marks can't exceed the questions drawn per exam.";
     for (let i = 0; i < questions.length; i++) {
       const q = questions[i];
       if (!q.text.trim()) return `Question ${i + 1} needs question text.`;
@@ -63,6 +69,7 @@ export default function NewQuestionPaperPage() {
       title: title.trim(),
       subject: subject.trim(),
       durationMinutes: Number(durationMinutes),
+      questionsPerExam: Number(questionsPerExam),
       passingMarks: Number(passingMarks),
       questions,
     });
@@ -98,13 +105,28 @@ export default function NewQuestionPaperPage() {
                 onChange={(e) => setDurationMinutes(e.target.value)}
               />
             </Field>
-            <Field label="Passing marks" hint={`Out of ${questions.length} question${questions.length === 1 ? "" : "s"}`}>
+            <Field
+              label="Questions per exam"
+              hint={`Randomly drawn from your ${questions.length}-question bank each time this is scheduled`}
+            >
+              <Input
+                type="number"
+                min="1"
+                value={questionsPerExam}
+                onChange={(e) => setQuestionsPerExam(e.target.value)}
+                placeholder="e.g. 50"
+              />
+            </Field>
+            <Field
+              label="Passing marks"
+              hint={`Out of ${questionsPerExam || "?"} question${Number(questionsPerExam) === 1 ? "" : "s"}`}
+            >
               <Input
                 type="number"
                 min="1"
                 value={passingMarks}
                 onChange={(e) => setPassingMarks(e.target.value)}
-                placeholder="e.g. 6"
+                placeholder="e.g. 30"
               />
             </Field>
           </div>
@@ -112,7 +134,13 @@ export default function NewQuestionPaperPage() {
 
         <div className={styles.section}>
           <div className={styles.sectionHead}>
-            <h2 className={styles.sectionTitle}>Questions ({questions.length})</h2>
+            <div>
+              <h2 className={styles.sectionTitle}>Question bank ({questions.length})</h2>
+              <p className={styles.sectionSub}>
+                Add as many as you like — e.g. 200-300. Each exam only draws{" "}
+                {questionsPerExam || "a set number of"} of them at random.
+              </p>
+            </div>
             <Button type="button" variant="secondary" size="sm" onClick={addQuestion}>
               + Add question
             </Button>

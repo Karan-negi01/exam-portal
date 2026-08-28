@@ -50,7 +50,10 @@ export default function NewExamPage() {
 
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>1. Choose a question paper</h2>
-          <p className={styles.sectionSub}>These are built and maintained by the CertifyHub team.</p>
+          <p className={styles.sectionSub}>
+            These are built and maintained by the CertifyHub team. Each time you schedule a paper,
+            a fresh random set of questions is drawn from its question bank.
+          </p>
 
           {papers.length === 0 ? (
             <Card>
@@ -78,9 +81,9 @@ export default function NewExamPage() {
                   <div className={styles.paperTitle}>{p.title}</div>
                   <div className={styles.paperSubject}>{p.subject}</div>
                   <div className={styles.paperMeta}>
-                    <span>❓ {p.questions.length} questions</span>
+                    <span>🎲 {p.questionsPerExam} of {p.questions.length} questions</span>
                     <span>⏱ {p.durationMinutes} min</span>
-                    <span>🎯 Pass {p.passingMarks}/{p.questions.length}</span>
+                    <span>🎯 Pass {p.passingMarks}/{p.questionsPerExam}</span>
                   </div>
                 </label>
               ))}

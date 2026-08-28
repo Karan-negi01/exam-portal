@@ -20,6 +20,12 @@
   font-size: 1.1rem;
 }
 
+.sectionSub {
+  color: var(--color-ink-soft);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
 .questions {
   display: flex;
   flex-direction: column;

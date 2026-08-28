@@ -56,10 +56,12 @@ export default function AdminQuestionPapersPage() {
                 </div>
               </div>
               <div className={styles.metaRow}>
-                <span>❓ {p.questions.length} questions</span>
+                <span>
+                  🎲 {p.questionsPerExam} of {p.questions.length} per exam
+                </span>
                 <span>⏱ {p.durationMinutes} min</span>
                 <span>
-                  🎯 Pass {p.passingMarks}/{p.questions.length}
+                  🎯 Pass {p.passingMarks}/{p.questionsPerExam}
                 </span>
               </div>
               <div className={styles.footRow}>

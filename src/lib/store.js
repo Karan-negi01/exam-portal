@@ -1,9 +1,10 @@
 import { generateId, generatePassword, centerPrefix } from "./ids";
 import { computeScore } from "./scoring";
 import { PRICE_PER_SEAT, oneYearFromNow, isQuotaExpired } from "./pricing";
+import { sampleArray } from "./shuffle";
 
 const STORAGE_KEY = "examplatform:db";
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 
 const listeners = new Set();
 
@@ -266,6 +267,7 @@ function buildSeed() {
     subject: "Accounting Software",
     durationMinutes: 30,
     passingMarks: 6,
+    questionsPerExam: 10,
     questions: tallyQuestions(),
     createdAt: daysAgo(60),
   };
@@ -276,6 +278,7 @@ function buildSeed() {
     subject: "MS Excel",
     durationMinutes: 45,
     passingMarks: 7,
+    questionsPerExam: 10,
     questions: excelQuestions(),
     createdAt: daysAgo(55),
   };
@@ -538,13 +541,21 @@ export function findStudentLogin(centerId, studentCode, password) {
 
 // ---------- Question papers (created by the platform, not the center) ----------
 
-export function createQuestionPaper({ title, subject, durationMinutes, passingMarks, questions }) {
+export function createQuestionPaper({
+  title,
+  subject,
+  durationMinutes,
+  passingMarks,
+  questionsPerExam,
+  questions,
+}) {
   const paper = {
     id: generateId("paper"),
     title,
     subject,
     durationMinutes,
     passingMarks,
+    questionsPerExam,
     questions: questions.map((q) => ({ id: generateId("q"), ...q })),
     createdAt: new Date().toISOString(),
   };
@@ -568,6 +579,8 @@ export function getQuestionPaperById(id) {
 
 export function scheduleExam(centerId, { questionPaperId, date }) {
   const paper = getQuestionPaperById(questionPaperId);
+  // Draw a fresh random subset from the paper's question bank every time an
+  // exam is scheduled, so repeat exams on the same paper don't repeat questions.
   const exam = {
     id: generateId("exam"),
     centerId,
@@ -579,7 +592,7 @@ export function scheduleExam(centerId, { questionPaperId, date }) {
     passingMarks: paper.passingMarks,
     status: "draft",
     assignedStudentIds: [],
-    questions: paper.questions,
+    questions: sampleArray(paper.questions, paper.questionsPerExam),
     createdAt: new Date().toISOString(),
   };
   setState((s) => ({ ...s, exams: [exam, ...s.exams] }));
