@@ -1,0 +1,30 @@
+.card {
+  max-width: 440px;
+}
+
+.sectionTitle {
+  font-size: 1.05rem;
+  margin-bottom: 18px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.error {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}

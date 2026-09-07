@@ -18,6 +18,11 @@ export function seatsRemaining(quota, usedSeats) {
   return Math.max(0, quota.seats - usedSeats);
 }
 
+export function daysUntilExpiry(quota) {
+  if (!quota?.expiresAt) return null;
+  return Math.ceil((new Date(quota.expiresAt).getTime() - Date.now()) / 86400000);
+}
+
 export function formatRupees(amount) {
   return `₹${amount.toLocaleString("en-IN")}`;
 }

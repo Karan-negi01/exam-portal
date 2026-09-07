@@ -64,6 +64,9 @@ export function AuthProvider({ children }) {
       if (center.status === "rejected") {
         return { ok: false, error: "Your center application was not approved." };
       }
+      if (center.status === "suspended") {
+        return { ok: false, error: "Your center has been suspended. Contact CertifyHub support." };
+      }
       persist({ role: "center", id: center.id, name: center.name, centerId: center.id });
       return { ok: true };
     },
@@ -74,6 +77,9 @@ export function AuthProvider({ children }) {
     (centerId, phone, password) => {
       const center = getCenterById(centerId);
       if (!center) return { ok: false, error: "Please select your center." };
+      if (center.status === "suspended") {
+        return { ok: false, error: "This center's account is currently inactive." };
+      }
       const student = findStudentLogin(centerId, phone, password);
       if (!student) return { ok: false, error: "Invalid phone number or password." };
       persist({

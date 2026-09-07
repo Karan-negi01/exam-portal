@@ -22,7 +22,9 @@ export default function StudentDashboardPage() {
   );
   const attempts = db.attempts.filter((a) => a.studentId === studentId);
   const attemptedExamIds = new Set(attempts.map((a) => a.examId));
-  const pendingExams = assignedExams.filter((e) => !attemptedExamIds.has(e.id));
+  const pendingExams = assignedExams.filter(
+    (e) => !attemptedExamIds.has(e.id) || (e.retakesGranted || []).includes(studentId)
+  );
   const passed = attempts.filter((a) => a.passed).length;
 
   return (

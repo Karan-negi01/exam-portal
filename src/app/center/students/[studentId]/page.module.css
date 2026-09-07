@@ -1,6 +1,16 @@
-.searchInput {
-  max-width: 340px;
-  width: 100%;
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.section {
+  margin-bottom: 28px;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
   margin-bottom: 16px;
 }
 
@@ -37,10 +47,6 @@
   white-space: nowrap;
 }
 
-.table tbody tr {
-  transition: background 0.12s ease;
-}
-
 .table tbody tr:hover {
   background: var(--color-surface-alt);
 }
@@ -53,20 +59,15 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 600;
-}
-
-.nameWrap:hover {
-  color: var(--color-primary);
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary), #818cf8);
   color: #fff;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -74,39 +75,8 @@
   flex-shrink: 0;
 }
 
-.code {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.password {
-  font-family: var(--font-mono);
-  background: var(--color-surface-alt);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
-.nameCell {
-  font-weight: 600;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.successBanner {
-  background: var(--color-success-light);
-  color: var(--color-success);
-  border-radius: var(--radius-sm);
-  padding: 14px 16px;
-  font-size: 0.88rem;
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+@media (max-width: 900px) {
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
 }

@@ -9,9 +9,22 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
 import { submitAttempt } from "@/lib/store";
+import { sendResultNotification } from "@/lib/notify";
 import styles from "./page.module.css";
 
 const LETTERS = ["A", "B", "C", "D"];
+const MAX_VIOLATIONS = 3;
+
+function requestFullscreen() {
+  const el = document.documentElement;
+  if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+}
+
+function exitFullscreen() {
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+  }
+}
 
 function formatClock(totalSeconds) {
   const m = Math.floor(totalSeconds / 60)
@@ -31,8 +44,11 @@ export default function TakeExamPage({ params }) {
 
   const studentId = session?.id;
   const exam = db.exams.find((e) => e.id === examId);
-  const alreadyAttempted =
-    exam && db.attempts.some((a) => a.examId === exam.id && a.studentId === studentId);
+  const studentAttempts = exam
+    ? db.attempts.filter((a) => a.examId === exam.id && a.studentId === studentId)
+    : [];
+  const retakeGranted = Boolean(exam?.retakesGranted?.includes(studentId));
+  const alreadyAttempted = studentAttempts.length > 0 && !retakeGranted;
   const isAssigned = exam && exam.assignedStudentIds.includes(studentId);
   const canTake = Boolean(exam && exam.status === "published" && isAssigned && !alreadyAttempted);
 
@@ -41,32 +57,89 @@ export default function TakeExamPage({ params }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [confirmingSubmit, setConfirmingSubmit] = useState(false);
+  const [violations, setViolations] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(true);
+  const [flaggedIds, setFlaggedIds] = useState([]);
 
   const submittedRef = useRef(false);
   const answersRef = useRef([]);
+  const secondsLeftRef = useRef(0);
+  const violationsRef = useRef(0);
+  const flaggedIdsRef = useRef([]);
 
-  // Exam data (and whether this student may take it) comes from the localStorage-backed
-  // store, which only finishes hydrating after mount — so this syncs local exam state to
-  // that external source once it becomes available, rather than being derivable up front.
   useEffect(() => {
-    if (exam && canTake && !initialized) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setAnswers(new Array(exam.questions.length).fill(null));
-      setSecondsLeft(exam.durationMinutes * 60);
-      setInitialized(true);
-    }
-  }, [exam, canTake, initialized]);
+    flaggedIdsRef.current = flaggedIds;
+  }, [flaggedIds]);
+
+  function toggleFlag(questionId) {
+    setFlaggedIds((ids) =>
+      ids.includes(questionId) ? ids.filter((id) => id !== questionId) : [...ids, questionId]
+    );
+  }
 
   useEffect(() => {
     answersRef.current = answers;
   }, [answers]);
 
+  useEffect(() => {
+    secondsLeftRef.current = secondsLeft;
+  }, [secondsLeft]);
+
+  function startExam() {
+    if (!exam) return;
+    setAnswers(new Array(exam.questions.length).fill(null));
+    setSecondsLeft(exam.durationMinutes * 60);
+    setInitialized(true);
+    requestFullscreen();
+  }
+
   function doSubmit(timeTakenSeconds) {
     if (submittedRef.current || !exam) return;
     submittedRef.current = true;
-    const attempt = submitAttempt(exam.id, studentId, answersRef.current, timeTakenSeconds);
+    exitFullscreen();
+    const attempt = submitAttempt(
+      exam.id,
+      studentId,
+      answersRef.current,
+      timeTakenSeconds,
+      violationsRef.current,
+      flaggedIdsRef.current
+    );
+    const student = db.students.find((s) => s.id === studentId);
+    if (student) sendResultNotification(student, exam, attempt);
     router.replace(`/student/result/${attempt.id}`);
   }
+
+  function flagViolation() {
+    if (submittedRef.current) return;
+    violationsRef.current += 1;
+    setViolations(violationsRef.current);
+    if (violationsRef.current >= MAX_VIOLATIONS) {
+      doSubmit(exam.durationMinutes * 60 - secondsLeftRef.current);
+    }
+  }
+
+  // Anti-cheat: flag every time the student leaves this tab, or drops out of
+  // fullscreen, during the exam. After too many violations, the exam is
+  // auto-submitted with whatever was answered.
+  useEffect(() => {
+    if (!canTake || !initialized) return;
+    function handleVisibilityChange() {
+      if (document.hidden) flagViolation();
+    }
+    function handleFullscreenChange() {
+      const inFullscreen = Boolean(document.fullscreenElement);
+      setIsFullscreen(inFullscreen);
+      if (!inFullscreen) flagViolation();
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canTake, initialized]);
 
   useEffect(() => {
     if (!canTake || !initialized) return;
@@ -141,7 +214,35 @@ export default function TakeExamPage({ params }) {
     );
   }
 
-  if (!initialized) return null;
+  if (!initialized) {
+    return (
+      <div className={styles.shell}>
+        <div className="container" style={{ paddingTop: 60 }}>
+          <Card className={styles.gateCard}>
+            <div className={styles.gateIcon}>🖥️</div>
+            <h1 className={styles.gateTitle}>{exam.title}</h1>
+            <p className={styles.gateSub}>{exam.subject}</p>
+            <div className={styles.gateMeta}>
+              <span>❓ {exam.questions.length} questions</span>
+              <span>⏱ {exam.durationMinutes} min</span>
+              <span>🎯 Pass {exam.passingMarks}/{exam.questions.length}</span>
+            </div>
+            <ul className={styles.gateRules}>
+              <li>This exam runs in fullscreen — leaving it or switching tabs is recorded.</li>
+              <li>
+                After {MAX_VIOLATIONS} such violations, your exam auto-submits with whatever you&apos;ve
+                answered.
+              </li>
+              <li>The timer starts the moment you click below and can&apos;t be paused.</li>
+            </ul>
+            <Button size="lg" onClick={startExam}>
+              Start exam (fullscreen)
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const question = exam.questions[currentIndex];
   const answeredCount = answers.filter((a) => a !== null).length;
@@ -172,9 +273,24 @@ export default function TakeExamPage({ params }) {
       </div>
 
       <div className={`container ${styles.body}`}>
+        {violations > 0 && (
+          <div className={styles.cheatWarning}>
+            ⚠️ Exam focus lost ({violations}/{MAX_VIOLATIONS}). Switching tabs or leaving fullscreen
+            is recorded — your exam will auto-submit if this happens {MAX_VIOLATIONS} times.
+          </div>
+        )}
         <Card className={styles.questionCard}>
-          <div className={styles.qLabel}>
-            Question {currentIndex + 1} of {exam.questions.length}
+          <div className={styles.qHead}>
+            <div className={styles.qLabel}>
+              Question {currentIndex + 1} of {exam.questions.length}
+            </div>
+            <button
+              type="button"
+              className={`${styles.flagBtn} ${flaggedIds.includes(question.id) ? styles.flagBtnActive : ""}`}
+              onClick={() => toggleFlag(question.id)}
+            >
+              🚩 {flaggedIds.includes(question.id) ? "Flagged" : "Flag this question"}
+            </button>
           </div>
           <div className={styles.qText}>{question.text}</div>
 
@@ -229,12 +345,12 @@ export default function TakeExamPage({ params }) {
               {answeredCount} of {exam.questions.length} answered
             </div>
             <div className={styles.qGrid}>
-              {exam.questions.map((_, i) => (
+              {exam.questions.map((q, i) => (
                 <button
                   key={i}
                   className={`${styles.qDot} ${answers[i] !== null ? styles.qDotAnswered : ""} ${
                     i === currentIndex ? styles.qDotCurrent : ""
-                  }`}
+                  } ${flaggedIds.includes(q.id) ? styles.qDotFlagged : ""}`}
                   onClick={() => setCurrentIndex(i)}
                   type="button"
                 >
@@ -258,6 +374,21 @@ export default function TakeExamPage({ params }) {
           onConfirm={confirmSubmit}
           onCancel={() => setConfirmingSubmit(false)}
         />
+      )}
+
+      {!isFullscreen && (
+        <div className={styles.fullscreenGate}>
+          <Card className={styles.fullscreenGateCard}>
+            <div className={styles.gateIcon}>🖥️</div>
+            <h2 className={styles.gateTitle}>You left fullscreen</h2>
+            <p className={styles.gateSub}>
+              This was recorded ({violations}/{MAX_VIOLATIONS}). Click below to continue your exam.
+            </p>
+            <Button size="lg" onClick={requestFullscreen}>
+              Resume exam
+            </Button>
+          </Card>
+        </div>
       )}
     </div>
   );

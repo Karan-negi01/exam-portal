@@ -196,3 +196,38 @@
   color: #94a3b8;
   margin-top: 16px;
 }
+
+.verifyBlock {
+  position: absolute;
+  bottom: 30px;
+  right: 40px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qr {
+  width: 52px;
+  height: 52px;
+  border-radius: 4px;
+  display: block;
+}
+
+.verifyText {
+  text-align: left;
+  font-family: Arial, sans-serif;
+}
+
+.verifyLabel {
+  font-size: 9px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.verifyCertId {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 700;
+  margin-top: 2px;
+}

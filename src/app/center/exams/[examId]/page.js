@@ -13,8 +13,8 @@ import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import CertificateDownloadButton from "@/components/certificate/CertificateDownloadButton";
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
-import { publishExam, deleteExam } from "@/lib/store";
-import { formatDate, formatDateOnly, formatDateTime, getInitials } from "@/lib/ids";
+import { publishExam, deleteExam, grantRetake } from "@/lib/store";
+import { formatDate, formatDateOnly, formatDateTime, getInitials, toCertId } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function ExamDetailPage({ params }) {
@@ -145,6 +145,7 @@ export default function ExamDetailPage({ params }) {
                     <th>Score</th>
                     <th>Result</th>
                     <th>Submitted</th>
+                    <th>Violations</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -152,9 +153,15 @@ export default function ExamDetailPage({ params }) {
                   {exam.assignedStudentIds.map((studentId) => {
                     const student = students.find((s) => s.id === studentId);
                     if (!student) return null;
-                    const attempt = db.attempts.find(
+                    const studentAttempts = db.attempts.filter(
                       (a) => a.examId === exam.id && a.studentId === studentId
                     );
+                    const attempt = studentAttempts.length
+                      ? studentAttempts.reduce((latest, a) =>
+                          new Date(a.submittedAt) > new Date(latest.submittedAt) ? a : latest
+                        )
+                      : null;
+                    const retakeGranted = (exam.retakesGranted || []).includes(studentId);
                     return (
                       <tr key={studentId}>
                         <td>
@@ -163,6 +170,12 @@ export default function ExamDetailPage({ params }) {
                             <span>
                               <strong>{student.name}</strong>{" "}
                               <span style={{ color: "var(--color-muted)" }}>· {student.studentCode}</span>
+                              {studentAttempts.length > 1 && (
+                                <span style={{ color: "var(--color-muted)" }}>
+                                  {" "}
+                                  · attempt {studentAttempts.length}
+                                </span>
+                              )}
                             </span>
                           </div>
                         </td>
@@ -175,23 +188,50 @@ export default function ExamDetailPage({ params }) {
                           ) : (
                             <Badge tone="neutral">Not attempted</Badge>
                           )}
+                          {retakeGranted && (
+                            <div style={{ marginTop: 4 }}>
+                              <Badge tone="info">Retake pending</Badge>
+                            </div>
+                          )}
                         </td>
                         <td>{attempt ? formatDateTime(attempt.submittedAt) : "—"}</td>
                         <td>
-                          {attempt?.passed && (
-                            <CertificateDownloadButton
-                              data={{
-                                studentName: student.name,
-                                examTitle: exam.title,
-                                subject: exam.subject,
-                                centerName: session?.name,
-                                score: attempt.score,
-                                totalMarks: attempt.totalMarks,
-                                dateStr: formatDate(attempt.submittedAt),
-                                certId: attempt.id.replace("attempt_", "").toUpperCase(),
-                              }}
-                            />
+                          {attempt ? (
+                            attempt.focusViolations > 0 ? (
+                              <Badge tone="danger">⚠️ {attempt.focusViolations}</Badge>
+                            ) : (
+                              <span style={{ color: "var(--color-muted)" }}>0</span>
+                            )
+                          ) : (
+                            "—"
                           )}
+                        </td>
+                        <td>
+                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                            {attempt?.passed && (
+                              <CertificateDownloadButton
+                                data={{
+                                  studentName: student.name,
+                                  examTitle: exam.title,
+                                  subject: exam.subject,
+                                  centerName: session?.name,
+                                  score: attempt.score,
+                                  totalMarks: attempt.totalMarks,
+                                  dateStr: formatDate(attempt.submittedAt),
+                                  certId: toCertId(attempt.id),
+                                }}
+                              />
+                            )}
+                            {attempt && !attempt.passed && !retakeGranted && (
+                              <Button
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => grantRetake(exam.id, studentId)}
+                              >
+                                Allow retake
+                              </Button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );

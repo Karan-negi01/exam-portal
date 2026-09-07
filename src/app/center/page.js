@@ -10,7 +10,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/lib/auth";
 import { useDB } from "@/lib/useDB";
-import { seatsRemaining } from "@/lib/pricing";
+import { seatsRemaining, isQuotaExpired, daysUntilExpiry } from "@/lib/pricing";
 import styles from "./page.module.css";
 
 export default function CenterOverviewPage() {
@@ -26,6 +26,10 @@ export default function CenterOverviewPage() {
   const passed = attempts.filter((a) => a.passed).length;
   const passRate = attempts.length ? Math.round((passed / attempts.length) * 100) : 0;
   const remaining = center ? seatsRemaining(center.quota, students.length) : 0;
+  const quotaExpired = center ? isQuotaExpired(center.quota) : false;
+  const daysLeft = center ? daysUntilExpiry(center.quota) : null;
+  const lowSeats = !quotaExpired && remaining > 0 && remaining <= 2;
+  const expiringSoon = !quotaExpired && daysLeft !== null && daysLeft <= 30;
 
   return (
     <DashboardShell
@@ -40,6 +44,25 @@ export default function CenterOverviewPage() {
         </Button>
       }
     >
+      {quotaExpired && (
+        <div className={`${styles.alertBanner} ${styles.alertDanger}`}>
+          ⚠️ Your seat quota has expired.{" "}
+          <Link href="/center/students">Buy a new Seat Pack →</Link>
+        </div>
+      )}
+      {!quotaExpired && lowSeats && (
+        <div className={`${styles.alertBanner} ${styles.alertWarning}`}>
+          🎟️ Only {remaining} seat{remaining === 1 ? "" : "s"} left in your quota.{" "}
+          <Link href="/center/students">Buy more →</Link>
+        </div>
+      )}
+      {!quotaExpired && !lowSeats && expiringSoon && (
+        <div className={`${styles.alertBanner} ${styles.alertWarning}`}>
+          ⏳ Your seat quota expires in {daysLeft} day{daysLeft === 1 ? "" : "s"}.{" "}
+          <Link href="/center/students">Manage seats →</Link>
+        </div>
+      )}
+
       <div className={styles.stats}>
         <StatCard tone="blue" icon="👥" value={`${students.length}/${center?.quota?.seats ?? 0}`} label="Seats used" />
         <StatCard tone="green" icon="🎟️" value={remaining} label="Seats remaining" />

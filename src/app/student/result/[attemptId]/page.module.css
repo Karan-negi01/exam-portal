@@ -82,3 +82,12 @@
   border-radius: var(--radius-sm);
   margin-bottom: 22px;
 }
+
+.cheatNote {
+  font-size: 0.8rem;
+  color: var(--color-danger);
+  background: var(--color-danger-light);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 22px;
+}

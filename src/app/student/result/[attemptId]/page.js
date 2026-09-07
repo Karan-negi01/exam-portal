@@ -63,6 +63,16 @@ export default function ResultPage({ params }) {
           </div>
         )}
 
+        <div className={styles.note}>📩 A copy of this result was sent to your phone.</div>
+
+        {attempt.focusViolations > 0 && (
+          <div className={styles.cheatNote}>
+            ⚠️ You left the exam view (switched tabs or exited fullscreen) {attempt.focusViolations}{" "}
+            time{attempt.focusViolations === 1 ? "" : "s"} — this was recorded and is visible to
+            your center.
+          </div>
+        )}
+
         <div className={styles.actions}>
           <Button href="/student" variant="secondary" size="lg">
             Back to dashboard

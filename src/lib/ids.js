@@ -16,6 +16,10 @@ export function generatePassword(length = 6) {
   return out;
 }
 
+export function toCertId(attemptId) {
+  return (attemptId || "").replace("attempt_", "").toUpperCase();
+}
+
 export function normalizePhone(phone) {
   // Compare by the last 10 digits so "+91 98111 22334" and "9811122334"
   // (with or without the country code / spacing) match the same student.

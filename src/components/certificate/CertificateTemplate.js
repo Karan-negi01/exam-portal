@@ -1,10 +1,23 @@
-import { forwardRef } from "react";
+"use client";
+
+import { forwardRef, useEffect, useState } from "react";
+import QRCode from "qrcode";
 import styles from "./CertificateTemplate.module.css";
 
 const CertificateTemplate = forwardRef(function CertificateTemplate(
   { studentName, examTitle, subject, centerName, dateStr, certId },
   ref
 ) {
+  const [qrDataUrl, setQrDataUrl] = useState("");
+
+  useEffect(() => {
+    if (!certId || typeof window === "undefined") return;
+    const verifyUrl = `${window.location.origin}/verify/${certId}`;
+    QRCode.toDataURL(verifyUrl, { margin: 1, width: 160 })
+      .then(setQrDataUrl)
+      .catch(() => {});
+  }, [certId]);
+
   return (
     <div ref={ref} className={styles.certificate}>
       <div className={styles.border}>
@@ -50,6 +63,14 @@ const CertificateTemplate = forwardRef(function CertificateTemplate(
         </div>
 
         <div className={styles.certId}>Certificate ID: {certId}</div>
+
+        <div className={styles.verifyBlock}>
+          {qrDataUrl && <img src={qrDataUrl} alt="Scan to verify" className={styles.qr} />}
+          <div className={styles.verifyText}>
+            <div className={styles.verifyLabel}>Scan to verify</div>
+            <div className={styles.verifyCertId}>{certId}</div>
+          </div>
+        </div>
       </div>
     </div>
   );

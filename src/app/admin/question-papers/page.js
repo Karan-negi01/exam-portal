@@ -68,14 +68,19 @@ export default function AdminQuestionPapersPage() {
                 <span style={{ fontSize: "0.82rem", color: "var(--color-muted)" }}>
                   Added {formatDate(p.createdAt)}
                 </span>
-                <Button
-                  size="sm"
-                  variant="danger"
-                  onClick={() => setDeleting(p)}
-                  disabled={usedPaperIds.has(p.id)}
-                >
-                  Delete
-                </Button>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <Button size="sm" variant="secondary" href={`/admin/question-papers/${p.id}/edit`}>
+                    Edit
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    onClick={() => setDeleting(p)}
+                    disabled={usedPaperIds.has(p.id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}

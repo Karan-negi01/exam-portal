@@ -5,6 +5,28 @@
   margin-bottom: 36px;
 }
 
+.alertBanner {
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  font-size: 0.88rem;
+  margin-bottom: 20px;
+}
+
+.alertBanner a {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.alertDanger {
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+}
+
+.alertWarning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
 .section {
   margin-bottom: 32px;
 }

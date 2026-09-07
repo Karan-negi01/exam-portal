@@ -1,10 +1,10 @@
-import { generateId, generatePassword, centerPrefix, normalizePhone } from "./ids";
+import { generateId, generatePassword, centerPrefix, normalizePhone, toCertId } from "./ids";
 import { computeScore } from "./scoring";
 import { PRICE_PER_SEAT, oneYearFromNow, isQuotaExpired } from "./pricing";
 import { sampleArray } from "./shuffle";
 
 const STORAGE_KEY = "examplatform:db";
-const STORAGE_VERSION = 3;
+const STORAGE_VERSION = 5;
 
 const listeners = new Set();
 
@@ -177,6 +177,7 @@ function buildSeed() {
         purchasedAt: daysAgo(40),
         expiresAt: oneYearFromNow(daysAgo(40)),
       },
+      revenueCollected: 10 * PRICE_PER_SEAT,
     },
     {
       id: "center_2",
@@ -198,6 +199,7 @@ function buildSeed() {
         purchasedAt: daysAgo(2),
         expiresAt: oneYearFromNow(daysAgo(2)),
       },
+      revenueCollected: 5 * PRICE_PER_SEAT,
     },
     {
       id: "center_3",
@@ -219,6 +221,7 @@ function buildSeed() {
         purchasedAt: daysAgo(70),
         expiresAt: oneYearFromNow(daysAgo(70)),
       },
+      revenueCollected: 5 * PRICE_PER_SEAT,
     },
   ];
 
@@ -299,6 +302,7 @@ function buildSeed() {
     status: "published",
     assignedStudentIds: ["student_1", "student_2", "student_3"],
     questions: paperTally.questions,
+    retakesGranted: [],
     createdAt: daysAgo(25),
   };
 
@@ -314,6 +318,7 @@ function buildSeed() {
     status: "draft",
     assignedStudentIds: [],
     questions: paperExcel.questions,
+    retakesGranted: [],
     createdAt: daysAgo(3),
   };
 
@@ -329,6 +334,8 @@ function buildSeed() {
     centerId: "center_1",
     answers: answers1,
     timeTakenSeconds: 1180,
+    focusViolations: 0,
+    flaggedQuestionIds: [],
     submittedAt: daysAgo(18),
     ...computeScore(exam1, answers1),
   };
@@ -340,6 +347,8 @@ function buildSeed() {
     centerId: "center_1",
     answers: answers2,
     timeTakenSeconds: 1690,
+    focusViolations: 2,
+    flaggedQuestionIds: [],
     submittedAt: daysAgo(17),
     ...computeScore(exam1, answers2),
   };
@@ -436,6 +445,7 @@ export function applyForCenter(data) {
       purchasedAt: now,
       expiresAt: oneYearFromNow(now),
     },
+    revenueCollected: (data.seats || 0) * PRICE_PER_SEAT,
   };
   setState((s) => ({ ...s, centers: [center, ...s.centers] }));
   return center;
@@ -456,6 +466,7 @@ export function addSeats(centerId, additionalSeats) {
           purchasedAt: now,
           expiresAt: oneYearFromNow(now),
         },
+        revenueCollected: (c.revenueCollected || 0) + additionalSeats * PRICE_PER_SEAT,
       };
     }),
   }));
@@ -479,6 +490,23 @@ export function rejectCenter(id) {
   }));
 }
 
+// Suspends a previously-approved center — blocks the owner and their students from
+// logging in, and drops the center from the public "select your center" list, without
+// losing their application/history the way rejecting a fresh application would imply.
+export function suspendCenter(id) {
+  setState((s) => ({
+    ...s,
+    centers: s.centers.map((c) => (c.id === id ? { ...c, status: "suspended" } : c)),
+  }));
+}
+
+export function reinstateCenter(id) {
+  setState((s) => ({
+    ...s,
+    centers: s.centers.map((c) => (c.id === id ? { ...c, status: "approved" } : c)),
+  }));
+}
+
 export function findCenterByEmail(email) {
   return state.centers.find((c) => c.email.toLowerCase() === (email || "").toLowerCase());
 }
@@ -489,6 +517,22 @@ export function getCenterById(id) {
 
 export function getApprovedCenters() {
   return state.centers.filter((c) => c.status === "approved");
+}
+
+export function changeCenterPassword(centerId, currentPassword, newPassword) {
+  const center = getCenterById(centerId);
+  if (!center) return { ok: false, error: "Center not found." };
+  if (center.password !== currentPassword) {
+    return { ok: false, error: "Current password is incorrect." };
+  }
+  if (!newPassword || newPassword.length < 4) {
+    return { ok: false, error: "New password must be at least 4 characters." };
+  }
+  setState((s) => ({
+    ...s,
+    centers: s.centers.map((c) => (c.id === centerId ? { ...c, password: newPassword } : c)),
+  }));
+  return { ok: true };
 }
 
 // ---------- Students ----------
@@ -545,6 +589,22 @@ export function findStudentLogin(centerId, phone, password) {
   );
 }
 
+export function changeStudentPassword(studentId, currentPassword, newPassword) {
+  const student = getStudentById(studentId);
+  if (!student) return { ok: false, error: "Student not found." };
+  if (student.password !== currentPassword) {
+    return { ok: false, error: "Current password is incorrect." };
+  }
+  if (!newPassword || newPassword.length < 4) {
+    return { ok: false, error: "New password must be at least 4 characters." };
+  }
+  setState((s) => ({
+    ...s,
+    students: s.students.map((st) => (st.id === studentId ? { ...st, password: newPassword } : st)),
+  }));
+  return { ok: true };
+}
+
 // ---------- Question papers (created by the platform, not the center) ----------
 
 export function createQuestionPaper({
@@ -573,6 +633,31 @@ export function deleteQuestionPaper(id) {
   setState((s) => ({ ...s, questionPapers: s.questionPapers.filter((p) => p.id !== id) }));
 }
 
+// Edits an existing paper's bank/settings. Already-scheduled exams keep the question
+// snapshot they were given at schedule time, so this only affects future scheduling.
+// Existing questions keep their id (so analytics stay tied to them); new ones get one.
+export function updateQuestionPaper(
+  id,
+  { title, subject, durationMinutes, passingMarks, questionsPerExam, questions }
+) {
+  setState((s) => ({
+    ...s,
+    questionPapers: s.questionPapers.map((p) =>
+      p.id === id
+        ? {
+            ...p,
+            title,
+            subject,
+            durationMinutes,
+            passingMarks,
+            questionsPerExam,
+            questions: questions.map((q) => (q.id ? q : { id: generateId("q"), ...q })),
+          }
+        : p
+    ),
+  }));
+}
+
 export function getQuestionPapers() {
   return state.questionPapers;
 }
@@ -599,6 +684,7 @@ export function scheduleExam(centerId, { questionPaperId, date }) {
     status: "draft",
     assignedStudentIds: [],
     questions: sampleArray(paper.questions, paper.questionsPerExam),
+    retakesGranted: [],
     createdAt: new Date().toISOString(),
   };
   setState((s) => ({ ...s, exams: [exam, ...s.exams] }));
@@ -610,6 +696,19 @@ export function publishExam(examId, assignedStudentIds) {
     ...s,
     exams: s.exams.map((e) =>
       e.id === examId ? { ...e, status: "published", assignedStudentIds } : e
+    ),
+  }));
+}
+
+// Lets a failed (or already-attempted) student take this exam again. The
+// grant is consumed the next time they submit — see submitAttempt below.
+export function grantRetake(examId, studentId) {
+  setState((s) => ({
+    ...s,
+    exams: s.exams.map((e) =>
+      e.id === examId
+        ? { ...e, retakesGranted: [...new Set([...(e.retakesGranted || []), studentId])] }
+        : e
     ),
   }));
 }
@@ -638,7 +737,14 @@ export function getAttemptForStudentExam(examId, studentId) {
   return state.attempts.find((a) => a.examId === examId && a.studentId === studentId);
 }
 
-export function submitAttempt(examId, studentId, answers, timeTakenSeconds) {
+export function submitAttempt(
+  examId,
+  studentId,
+  answers,
+  timeTakenSeconds,
+  focusViolations = 0,
+  flaggedQuestionIds = []
+) {
   const exam = getExamById(examId);
   const result = computeScore(exam, answers);
   const attempt = {
@@ -648,10 +754,21 @@ export function submitAttempt(examId, studentId, answers, timeTakenSeconds) {
     centerId: exam.centerId,
     answers,
     timeTakenSeconds,
+    focusViolations,
+    flaggedQuestionIds,
     submittedAt: new Date().toISOString(),
     ...result,
   };
-  setState((s) => ({ ...s, attempts: [...s.attempts, attempt] }));
+  setState((s) => ({
+    ...s,
+    attempts: [...s.attempts, attempt],
+    // Submitting consumes any retake grant — the owner must grant another one for a further attempt.
+    exams: s.exams.map((e) =>
+      e.id === examId
+        ? { ...e, retakesGranted: (e.retakesGranted || []).filter((id) => id !== studentId) }
+        : e
+    ),
+  }));
   return attempt;
 }
 
@@ -663,6 +780,23 @@ export function getAttemptsByStudent(studentId) {
   return state.attempts.filter((a) => a.studentId === studentId);
 }
 
+// A student may now have multiple attempts at the same exam (after a retake
+// is granted) — this returns the most recent one.
+export function getLatestAttempt(examId, studentId) {
+  const attempts = state.attempts.filter((a) => a.examId === examId && a.studentId === studentId);
+  if (attempts.length === 0) return undefined;
+  return attempts.reduce((latest, a) =>
+    new Date(a.submittedAt) > new Date(latest.submittedAt) ? a : latest
+  );
+}
+
 export function getAttemptById(id) {
   return state.attempts.find((a) => a.id === id);
+}
+
+// Certificate IDs are just the attempt ID, shortened and uppercased — this
+// looks them back up for the public /verify/[certId] page.
+export function getAttemptByCertId(certId) {
+  const normalized = (certId || "").trim().toUpperCase();
+  return state.attempts.find((a) => toCertId(a.id) === normalized);
 }

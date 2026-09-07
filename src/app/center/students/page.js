@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { CENTER_NAV } from "@/components/dashboard/navConfig";
 import Card from "@/components/ui/Card";
@@ -31,6 +32,14 @@ export default function CenterStudentsPage() {
   const [buyingSeats, setBuyingSeats] = useState(false);
   const [justAdded, setJustAdded] = useState(null);
   const [removingStudent, setRemovingStudent] = useState(null);
+  const [search, setSearch] = useState("");
+
+  const query = search.trim().toLowerCase();
+  const visibleStudents = query
+    ? students.filter((s) =>
+        [s.name, s.phone, s.studentCode].some((field) => (field || "").toLowerCase().includes(query))
+      )
+    : students;
 
   return (
     <DashboardShell
@@ -77,6 +86,15 @@ export default function CenterStudentsPage() {
         </div>
       )}
 
+      {students.length > 0 && (
+        <Input
+          className={styles.searchInput}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name, phone or student ID…"
+        />
+      )}
+
       <Card padding="none">
         {students.length === 0 ? (
           <EmptyState
@@ -89,6 +107,8 @@ export default function CenterStudentsPage() {
               </Button>
             }
           />
+        ) : visibleStudents.length === 0 ? (
+          <EmptyState icon="🔍" title="No students match your search" />
         ) : (
           <div className={styles.tableWrap}>
             <table className={styles.table}>
@@ -103,14 +123,14 @@ export default function CenterStudentsPage() {
                 </tr>
               </thead>
               <tbody>
-                {students.map((s) => (
+                {visibleStudents.map((s) => (
                   <tr key={s.id}>
                     <td className={styles.code}>{s.studentCode}</td>
                     <td className={styles.nameCell}>
-                      <div className={styles.nameWrap}>
+                      <Link href={`/center/students/${s.id}`} className={styles.nameWrap}>
                         <span className={styles.avatar}>{getInitials(s.name)}</span>
                         {s.name}
-                      </div>
+                      </Link>
                     </td>
                     <td>{s.phone}</td>
                     <td>
