@@ -6,17 +6,39 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import EmptyState from "@/components/ui/EmptyState";
-import { useDB } from "@/lib/useDB";
-import { deleteQuestionPaper } from "@/lib/store";
+import DataState from "@/components/ui/DataState";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
+import { deleteQuestionPaper } from "@/actions/questionPapers";
 import { formatDate } from "@/lib/ids";
 import { useState } from "react";
 import styles from "./page.module.css";
 
 export default function AdminQuestionPapersPage() {
-  const db = useDB();
+  const { data: db, loading, error, refresh } = useAsyncData(getFullDb);
   const [deleting, setDeleting] = useState(null);
-  const papers = db.questionPapers;
 
+  async function handleConfirmDelete() {
+    await deleteQuestionPaper(deleting.id);
+    setDeleting(null);
+    refresh();
+  }
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell
+        navItems={ADMIN_NAV}
+        roleTag="Platform admin"
+        userMeta="Full platform access"
+        title="Question papers"
+        subtitle="Build the official MCQ papers that centers can schedule for their students."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
+
+  const papers = db.questionPapers;
   const usedPaperIds = new Set(db.exams.map((e) => e.questionPaperId));
 
   return (
@@ -93,10 +115,7 @@ export default function AdminQuestionPapersPage() {
           message={`Delete "${deleting.title}"? Centers won't be able to schedule it anymore.`}
           confirmLabel="Delete"
           tone="danger"
-          onConfirm={() => {
-            deleteQuestionPaper(deleting.id);
-            setDeleting(null);
-          }}
+          onConfirm={handleConfirmDelete}
           onCancel={() => setDeleting(null)}
         />
       )}

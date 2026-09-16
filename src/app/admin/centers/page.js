@@ -9,8 +9,10 @@ import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Input } from "@/components/ui/Field";
-import { useDB } from "@/lib/useDB";
-import { approveCenter, rejectCenter, suspendCenter, reinstateCenter } from "@/lib/store";
+import DataState from "@/components/ui/DataState";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
+import { approveCenter, rejectCenter, suspendCenter, reinstateCenter } from "@/actions/centers";
 import { formatDate } from "@/lib/ids";
 import styles from "./page.module.css";
 
@@ -25,10 +27,42 @@ const FILTERS = [
 const STATUS_TONE = { pending: "warning", approved: "success", suspended: "warning", rejected: "danger" };
 
 export default function AdminCentersPage() {
-  const db = useDB();
+  const { data: db, loading, error, refresh } = useAsyncData(getFullDb);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [suspending, setSuspending] = useState(null);
+
+  async function handleApprove(id) {
+    await approveCenter(id);
+    refresh();
+  }
+  async function handleReject(id) {
+    await rejectCenter(id);
+    refresh();
+  }
+  async function handleReinstate(id) {
+    await reinstateCenter(id);
+    refresh();
+  }
+  async function handleConfirmSuspend() {
+    await suspendCenter(suspending.id);
+    setSuspending(null);
+    refresh();
+  }
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell
+        navItems={ADMIN_NAV}
+        roleTag="Platform admin"
+        userMeta="Full platform access"
+        title="Centers"
+        subtitle="Every center that has applied to list on CertifyHub."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
 
   const byStatus = filter === "all" ? db.centers : db.centers.filter((c) => c.status === filter);
   const query = search.trim().toLowerCase();
@@ -106,10 +140,10 @@ export default function AdminCentersPage() {
                     <td>
                       {c.status === "pending" && (
                         <div className={styles.actionsCell}>
-                          <Button size="sm" variant="danger" onClick={() => rejectCenter(c.id)}>
+                          <Button size="sm" variant="danger" onClick={() => handleReject(c.id)}>
                             Reject
                           </Button>
-                          <Button size="sm" variant="primary" onClick={() => approveCenter(c.id)}>
+                          <Button size="sm" variant="primary" onClick={() => handleApprove(c.id)}>
                             Approve
                           </Button>
                         </div>
@@ -123,7 +157,7 @@ export default function AdminCentersPage() {
                       )}
                       {c.status === "suspended" && (
                         <div className={styles.actionsCell}>
-                          <Button size="sm" variant="primary" onClick={() => reinstateCenter(c.id)}>
+                          <Button size="sm" variant="primary" onClick={() => handleReinstate(c.id)}>
                             Reinstate
                           </Button>
                         </div>
@@ -143,10 +177,7 @@ export default function AdminCentersPage() {
           message={`Suspend "${suspending.name}"? The owner and their students won't be able to log in until you reinstate them.`}
           confirmLabel="Suspend"
           tone="danger"
-          onConfirm={() => {
-            suspendCenter(suspending.id);
-            setSuspending(null);
-          }}
+          onConfirm={handleConfirmSuspend}
           onCancel={() => setSuspending(null)}
         />
       )}

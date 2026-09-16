@@ -7,7 +7,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
 import { useAuth } from "@/lib/auth";
-import { changeCenterPassword } from "@/lib/store";
+import { changeCenterPassword } from "@/actions/centers";
 import styles from "./page.module.css";
 
 export default function CenterSettingsPage() {
@@ -18,7 +18,7 @@ export default function CenterSettingsPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -26,7 +26,7 @@ export default function CenterSettingsPage() {
       setError("New password and confirmation don't match.");
       return;
     }
-    const result = changeCenterPassword(session.centerId, currentPassword, newPassword);
+    const result = await changeCenterPassword(session.centerId, currentPassword, newPassword);
     if (!result.ok) {
       setError(result.error);
       return;

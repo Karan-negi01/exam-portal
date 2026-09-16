@@ -5,12 +5,39 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 import { ADMIN_NAV } from "@/components/dashboard/navConfig";
 import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import CenterRequestCard from "@/components/admin/CenterRequestCard";
-import { useDB } from "@/lib/useDB";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
+import { approveCenter, rejectCenter } from "@/actions/centers";
 import styles from "./page.module.css";
 
 export default function AdminOverviewPage() {
-  const db = useDB();
+  const { data: db, loading, error, refresh } = useAsyncData(getFullDb);
+
+  async function handleApprove(id) {
+    await approveCenter(id);
+    refresh();
+  }
+
+  async function handleReject(id) {
+    await rejectCenter(id);
+    refresh();
+  }
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell
+        navItems={ADMIN_NAV}
+        roleTag="Platform admin"
+        userMeta="Full platform access"
+        title="Admin overview"
+        subtitle="Review center applications and keep an eye on the platform."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
 
   const pending = db.centers.filter((c) => c.status === "pending");
   const approved = db.centers.filter((c) => c.status === "approved");
@@ -45,7 +72,7 @@ export default function AdminOverviewPage() {
         ) : (
           <div className={styles.list}>
             {pending.map((c) => (
-              <CenterRequestCard key={c.id} center={c} />
+              <CenterRequestCard key={c.id} center={c} onApprove={handleApprove} onReject={handleReject} />
             ))}
           </div>
         )}

@@ -5,7 +5,7 @@ import FormShell from "@/components/site/FormShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
-import { applyForCenter, findCenterByEmail } from "@/lib/store";
+import { applyForCenter } from "@/actions/centers";
 import { PRICE_PER_SEAT, formatRupees } from "@/lib/pricing";
 import { formatDate } from "@/lib/ids";
 import styles from "./page.module.css";
@@ -81,26 +81,25 @@ export default function ApplyPage() {
     setErrors(validation);
     if (Object.keys(validation).length > 0) return;
 
-    if (findCenterByEmail(form.email)) {
-      setFormError("A center is already registered with this email.");
-      return;
-    }
-
     const finalCourseTypes = form.courseTypes.map((c) =>
       c === OTHER_LABEL ? form.otherCourseType.trim() : c
     );
 
     setPaying(true);
     // Razorpay isn't wired up yet — this simulates a successful payment for the demo.
-    setTimeout(() => {
-      const center = applyForCenter({
+    setTimeout(async () => {
+      const result = await applyForCenter({
         ...form,
         courseTypes: finalCourseTypes,
         seats: Number(form.seats),
         panCardName: fileName || null,
       });
       setPaying(false);
-      setSubmitted(center);
+      if (!result.ok) {
+        setFormError(result.error);
+        return;
+      }
+      setSubmitted(result.center);
     }, 700);
   }
 

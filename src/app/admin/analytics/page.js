@@ -6,16 +6,31 @@ import StatCard from "@/components/ui/StatCard";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
-import { useDB } from "@/lib/useDB";
-import { computeAnalytics } from "@/lib/analytics";
+import DataState from "@/components/ui/DataState";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { computeAnalytics } from "@/actions/analytics";
 import { formatRupees } from "@/lib/pricing";
 import styles from "./page.module.css";
 
 const STATUS_TONE = { approved: "success", pending: "warning", suspended: "warning", rejected: "danger" };
 
 export default function AdminAnalyticsPage() {
-  const db = useDB();
-  const analytics = computeAnalytics(db);
+  const { data: analytics, loading, error } = useAsyncData(computeAnalytics);
+
+  if (loading || error || !analytics) {
+    return (
+      <DashboardShell
+        navItems={ADMIN_NAV}
+        roleTag="Platform admin"
+        userMeta="Full platform access"
+        title="Analytics"
+        subtitle="Revenue, exam performance and center activity across the platform."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
+
   const maxScheduled = Math.max(1, ...analytics.popularPapers.map((p) => p.timesScheduled));
 
   return (
@@ -103,46 +118,6 @@ export default function AdminAnalyticsPage() {
                         <Badge tone={q.missRate >= 50 ? "danger" : "warning"}>{q.missRate}%</Badge>
                       </td>
                       <td>{q.total}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        )}
-      </div>
-
-      <div className={styles.section}>
-        <div className={styles.sectionHead}>
-          <h2 className={styles.sectionTitle}>Flagged by students</h2>
-        </div>
-        {analytics.topFlaggedQuestions.length === 0 ? (
-          <Card>
-            <EmptyState
-              icon="🚩"
-              title="No questions flagged"
-              description="Students can flag a question as unclear or wrong during an exam — flags show up here."
-            />
-          </Card>
-        ) : (
-          <Card padding="none">
-            <div className={styles.tableWrap}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Question</th>
-                    <th>Paper</th>
-                    <th>Times flagged</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {analytics.topFlaggedQuestions.map((q) => (
-                    <tr key={q.questionId}>
-                      <td className={styles.questionText}>{q.text}</td>
-                      <td>{q.paperTitle}</td>
-                      <td>
-                        <Badge tone="danger">🚩 {q.flagCount}</Badge>
-                      </td>
                     </tr>
                   ))}
                 </tbody>

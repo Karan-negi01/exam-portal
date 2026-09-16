@@ -3,12 +3,11 @@
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
-import { approveCenter, rejectCenter } from "@/lib/store";
 import { formatDate } from "@/lib/ids";
 import { formatRupees } from "@/lib/pricing";
 import styles from "./CenterRequestCard.module.css";
 
-export default function CenterRequestCard({ center }) {
+export default function CenterRequestCard({ center, onApprove, onReject }) {
   return (
     <Card padding="none" className={styles.card}>
       <div className={styles.info}>
@@ -40,10 +39,10 @@ export default function CenterRequestCard({ center }) {
         </div>
       </div>
       <div className={styles.actions}>
-        <Button variant="danger" size="sm" onClick={() => rejectCenter(center.id)}>
+        <Button variant="danger" size="sm" onClick={() => onReject(center.id)}>
           Reject
         </Button>
-        <Button variant="primary" size="sm" onClick={() => approveCenter(center.id)}>
+        <Button variant="primary" size="sm" onClick={() => onApprove(center.id)}>
           Approve
         </Button>
       </div>

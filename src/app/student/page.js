@@ -3,19 +3,34 @@
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { STUDENT_NAV } from "@/components/dashboard/navConfig";
 import Card from "@/components/ui/Card";
-import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
 import { formatDateTime } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function StudentDashboardPage() {
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error } = useAsyncData(getFullDb);
   const studentId = session?.id;
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell
+        navItems={STUDENT_NAV}
+        roleTag="Student"
+        userMeta={session?.centerName}
+        title={`Welcome, ${session?.name?.split(" ")[0] || ""}`}
+        subtitle="Here are your exams."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
 
   const assignedExams = db.exams.filter(
     (e) => e.status === "published" && e.assignedStudentIds.includes(studentId)
@@ -25,7 +40,6 @@ export default function StudentDashboardPage() {
   const pendingExams = assignedExams.filter(
     (e) => !attemptedExamIds.has(e.id) || (e.retakesGranted || []).includes(studentId)
   );
-  const passed = attempts.filter((a) => a.passed).length;
 
   return (
     <DashboardShell
@@ -33,12 +47,11 @@ export default function StudentDashboardPage() {
       roleTag="Student"
       userMeta={session?.centerName}
       title={`Welcome, ${session?.name?.split(" ")[0]}`}
-      subtitle="Here are your exams and results."
+      subtitle="Here are your exams."
     >
       <div className={styles.stats}>
         <StatCard tone="indigo" icon="📝" value={pendingExams.length} label="Exams pending" />
         <StatCard tone="blue" icon="🧾" value={attempts.length} label="Exams completed" />
-        <StatCard tone="amber" icon="🏅" value={passed} label="Certificates earned" />
       </div>
 
       <div className={styles.section}>
@@ -66,10 +79,10 @@ export default function StudentDashboardPage() {
       </div>
 
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Your results</h2>
+        <h2 className={styles.sectionTitle}>Submitted exams</h2>
         <Card padding="none">
           {attempts.length === 0 ? (
-            <EmptyState icon="📊" title="No results yet" description="Results appear here once you complete an exam." />
+            <EmptyState icon="📊" title="Nothing submitted yet" description="Exams you've taken appear here." />
           ) : (
             attempts
               .slice()
@@ -84,11 +97,7 @@ export default function StudentDashboardPage() {
                       <div className={styles.resultSub}>Submitted {formatDateTime(a.submittedAt)}</div>
                     </div>
                     <div className={styles.resultRight}>
-                      <span>{a.score}/{a.totalMarks}</span>
-                      <Badge tone={a.passed ? "success" : "danger"}>{a.passed ? "Pass" : "Fail"}</Badge>
-                      <Button href={`/student/result/${a.id}`} variant="secondary" size="sm">
-                        View
-                      </Button>
+                      <span className={styles.submittedTag}>Awaiting your center</span>
                     </div>
                   </div>
                 );

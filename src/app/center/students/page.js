@@ -9,12 +9,14 @@ import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import { Field, Input } from "@/components/ui/Field";
 import SeatStatusCard from "@/components/center/SeatStatusCard";
 import BuySeatsModal from "@/components/center/BuySeatsModal";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
-import { addStudent, removeStudent } from "@/lib/store";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
+import { addStudent, removeStudent, resetStudentPassword } from "@/actions/students";
 import { sendStudentCredentialsSms } from "@/lib/notify";
 import { seatsRemaining } from "@/lib/pricing";
 import { formatDate, getInitials } from "@/lib/ids";
@@ -22,17 +24,48 @@ import styles from "./page.module.css";
 
 export default function CenterStudentsPage() {
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error, refresh } = useAsyncData(getFullDb);
   const centerId = session?.centerId;
-  const center = db.centers.find((c) => c.id === centerId);
-  const students = db.students.filter((s) => s.centerId === centerId);
-  const remaining = center ? seatsRemaining(center.quota, students.length) : 0;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [buyingSeats, setBuyingSeats] = useState(false);
   const [justAdded, setJustAdded] = useState(null);
   const [removingStudent, setRemovingStudent] = useState(null);
+  const [resettingStudent, setResettingStudent] = useState(null);
   const [search, setSearch] = useState("");
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell
+        navItems={CENTER_NAV}
+        roleTag="Center owner"
+        userMeta={session?.name}
+        title="Students"
+        subtitle="Every enrolled student logs in with their phone number and a password."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
+
+  const center = db.centers.find((c) => c.id === centerId);
+  const students = db.students.filter((s) => s.centerId === centerId);
+  const remaining = center ? seatsRemaining(center.quota, students.length) : 0;
+
+  async function handleRemoveConfirm() {
+    await removeStudent(removingStudent.id);
+    setRemovingStudent(null);
+    refresh();
+  }
+
+  async function handleResetPassword(student) {
+    setResettingStudent(student.id);
+    const result = await resetStudentPassword(student.id);
+    setResettingStudent(null);
+    if (!result.ok) return;
+    const sms = await sendStudentCredentialsSms(result.student);
+    setJustAdded({ ...result.student, smsSent: sms.ok, reset: true });
+  }
 
   const query = search.trim().toLowerCase();
   const visibleStudents = query
@@ -58,9 +91,10 @@ export default function CenterStudentsPage() {
         <SeatStatusCard
           center={center}
           usedSeats={students.length}
-          onPurchased={(seats) =>
-            setJustAdded({ seatsPurchased: seats })
-          }
+          onPurchased={(seats) => {
+            setJustAdded({ seatsPurchased: seats });
+            refresh();
+          }}
         />
       )}
 
@@ -76,8 +110,8 @@ export default function CenterStudentsPage() {
       {justAdded?.studentCode && (
         <div className={styles.successBanner}>
           <span>
-            ✓ {justAdded.name} added — login is <b>{justAdded.phone}</b> + password{" "}
-            <b>{justAdded.password}</b>.{" "}
+            ✓ {justAdded.reset ? `${justAdded.name}'s password reset` : `${justAdded.name} added`} —
+            login is <b>{justAdded.phone}</b> + password <b>{justAdded.password}</b>.{" "}
             {justAdded.smsSent ? "Sent to their phone via SMS (demo)." : ""}
           </span>
           <Button size="sm" variant="ghost" onClick={() => setJustAdded(null)}>
@@ -117,7 +151,6 @@ export default function CenterStudentsPage() {
                   <th>Student ID</th>
                   <th>Name</th>
                   <th>Phone (login)</th>
-                  <th>Password</th>
                   <th>Enrolled</th>
                   <th></th>
                 </tr>
@@ -133,14 +166,21 @@ export default function CenterStudentsPage() {
                       </Link>
                     </td>
                     <td>{s.phone}</td>
-                    <td>
-                      <span className={styles.password}>{s.password}</span>
-                    </td>
                     <td>{formatDate(s.createdAt)}</td>
                     <td>
-                      <Button size="sm" variant="ghost" onClick={() => setRemovingStudent(s)}>
-                        Remove
-                      </Button>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleResetPassword(s)}
+                          disabled={resettingStudent === s.id}
+                        >
+                          {resettingStudent === s.id ? "Resetting…" : "Reset password"}
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => setRemovingStudent(s)}>
+                          Remove
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -158,6 +198,7 @@ export default function CenterStudentsPage() {
           onAdded={(student) => {
             setJustAdded(student);
             setModalOpen(false);
+            refresh();
           }}
           onBuySeats={() => {
             setModalOpen(false);
@@ -173,6 +214,7 @@ export default function CenterStudentsPage() {
           onPurchased={(seats) => {
             setBuyingSeats(false);
             setJustAdded({ seatsPurchased: seats });
+            refresh();
           }}
         />
       )}
@@ -183,10 +225,7 @@ export default function CenterStudentsPage() {
           message={`Remove ${removingStudent.name} from your center? They'll no longer be able to log in.`}
           confirmLabel="Remove"
           tone="danger"
-          onConfirm={() => {
-            removeStudent(removingStudent.id);
-            setRemovingStudent(null);
-          }}
+          onConfirm={handleRemoveConfirm}
           onCancel={() => setRemovingStudent(null)}
         />
       )}
@@ -213,13 +252,13 @@ function AddStudentModal({ centerId, remainingSeats, onClose, onAdded, onBuySeat
     );
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!name.trim()) return setError("Student name is required.");
     if (!phone.trim()) return setError("Phone number is required — students log in with it.");
-    const result = addStudent(centerId, { name: name.trim(), phone: phone.trim() });
+    const result = await addStudent(centerId, { name: name.trim(), phone: phone.trim() });
     if (!result.ok) return setError(result.error);
-    const sms = sendStudentCredentialsSms(result.student);
+    const sms = await sendStudentCredentialsSms(result.student);
     onAdded({ ...result.student, smsSent: sms.ok });
   }
 

@@ -7,14 +7,24 @@ import { ADMIN_NAV } from "@/components/dashboard/navConfig";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import QuestionPaperForm from "@/components/admin/QuestionPaperForm";
-import { useDB } from "@/lib/useDB";
-import { updateQuestionPaper } from "@/lib/store";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
+import { updateQuestionPaper } from "@/actions/questionPapers";
 
 export default function EditQuestionPaperPage({ params }) {
   const { paperId } = use(params);
   const router = useRouter();
-  const db = useDB();
+  const { data: db, loading, error } = useAsyncData(getFullDb);
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell navItems={ADMIN_NAV} roleTag="Platform admin" userMeta="Full platform access" title="Edit question paper">
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
 
   const paper = db.questionPapers.find((p) => p.id === paperId);
 
@@ -45,8 +55,8 @@ export default function EditQuestionPaperPage({ params }) {
         initialData={paper}
         submitLabel="Save changes"
         onCancel={() => router.push("/admin/question-papers")}
-        onSubmit={(data) => {
-          updateQuestionPaper(paper.id, data);
+        onSubmit={async (data) => {
+          await updateQuestionPaper(paper.id, data);
           router.push("/admin/question-papers");
         }}
       />

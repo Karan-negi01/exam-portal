@@ -4,7 +4,7 @@ import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
-import { addSeats } from "@/lib/store";
+import { addSeats } from "@/actions/centers";
 import { PRICE_PER_SEAT, formatRupees } from "@/lib/pricing";
 import styles from "./SeatStatusCard.module.css";
 
@@ -19,8 +19,8 @@ export default function BuySeatsModal({ centerId, onClose, onPurchased }) {
     if (!seats || seats < 1) return;
     setPaying(true);
     // Razorpay isn't wired up yet — this simulates a successful payment for the demo.
-    setTimeout(() => {
-      addSeats(centerId, Number(seats));
+    setTimeout(async () => {
+      await addSeats(centerId, Number(seats));
       setPaying(false);
       onPurchased(Number(seats));
     }, 600);

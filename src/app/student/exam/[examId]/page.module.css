@@ -139,44 +139,13 @@
   padding: 32px;
 }
 
-.qHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
 .qLabel {
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--color-primary);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-}
-
-.flagBtn {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-ink-soft);
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-
-.flagBtn:hover {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
-}
-
-.flagBtnActive {
-  background: var(--color-danger-light);
-  border-color: var(--color-danger);
-  color: var(--color-danger);
+  margin-bottom: 12px;
 }
 
 .qText {
@@ -279,18 +248,6 @@
 .qDotCurrent {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px var(--color-primary-light);
-}
-
-.qDotFlagged {
-  position: relative;
-}
-
-.qDotFlagged::after {
-  content: "🚩";
-  position: absolute;
-  top: -8px;
-  right: -6px;
-  font-size: 0.6rem;
 }
 
 .progressText {

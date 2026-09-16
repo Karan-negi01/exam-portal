@@ -4,15 +4,25 @@ import { use } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
 import { formatDateTime } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function ResultPage({ params }) {
   const { attemptId } = use(params);
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error } = useAsyncData(getFullDb);
+
+  if (loading || error || !db) {
+    return (
+      <div className={styles.wrap}>
+        <DataState loading={loading} error={error} />
+      </div>
+    );
+  }
 
   const attempt = db.attempts.find((a) => a.id === attemptId && a.studentId === session?.id);
   const exam = attempt && db.exams.find((e) => e.id === attempt.examId);
@@ -31,39 +41,16 @@ export default function ResultPage({ params }) {
   return (
     <div className={styles.wrap}>
       <Card className={styles.card}>
-        <div className={`${styles.icon} ${attempt.passed ? styles.iconPass : styles.iconFail}`}>
-          {attempt.passed ? "🎉" : "😕"}
-        </div>
-        <h1 className={styles.title}>{attempt.passed ? "You passed!" : "Not quite there"}</h1>
+        <div className={styles.icon}>✅</div>
+        <h1 className={styles.title}>Exam submitted</h1>
         <p className={styles.subtitle}>
           {exam.title} · Submitted {formatDateTime(attempt.submittedAt)}
         </p>
 
-        <div className={styles.scoreRow}>
-          <div className={styles.scoreItem}>
-            <div className={styles.scoreValue}>
-              {attempt.score}/{attempt.totalMarks}
-            </div>
-            <div className={styles.scoreLabel}>Score</div>
-          </div>
-          <div className={styles.scoreItem}>
-            <div className={styles.scoreValue}>{exam.passingMarks}</div>
-            <div className={styles.scoreLabel}>Passing marks</div>
-          </div>
+        <div className={styles.note}>
+          Your answers have been sent to {center?.name || "your center"}. They&apos;ll let you know how
+          you did, and share your certificate with you if you&apos;ve passed.
         </div>
-
-        {attempt.passed ? (
-          <div className={styles.note}>
-            🏅 Congratulations, you passed! Contact {center?.name} to get your certificate.
-          </div>
-        ) : (
-          <div className={styles.note}>
-            You didn&apos;t meet the passing marks this time. Reach out to {center?.name} about
-            reattempting.
-          </div>
-        )}
-
-        <div className={styles.note}>📩 A copy of this result was sent to your phone.</div>
 
         {attempt.focusViolations > 0 && (
           <div className={styles.cheatNote}>

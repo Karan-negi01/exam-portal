@@ -23,15 +23,8 @@
   justify-content: center;
   font-size: 2.2rem;
   margin: 0 auto 20px;
-}
-
-.iconPass {
-  background: var(--color-success-light);
-  color: var(--color-success);
-}
-.iconFail {
-  background: var(--color-danger-light);
-  color: var(--color-danger);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
 }
 
 .title {
@@ -43,29 +36,6 @@
   color: var(--color-ink-soft);
   font-size: 0.92rem;
   margin-bottom: 28px;
-}
-
-.scoreRow {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  margin-bottom: 30px;
-}
-
-.scoreItem {
-  text-align: center;
-}
-
-.scoreValue {
-  font-size: 1.7rem;
-  font-weight: 800;
-}
-
-.scoreLabel {
-  font-size: 0.78rem;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .actions {

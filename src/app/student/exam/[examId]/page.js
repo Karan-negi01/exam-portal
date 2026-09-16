@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
-import { submitAttempt } from "@/lib/store";
-import { sendResultNotification } from "@/lib/notify";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
+import { submitAttempt } from "@/actions/attempts";
+import { notifyCenterOfResult } from "@/lib/notify";
 import styles from "./page.module.css";
 
 const LETTERS = ["A", "B", "C", "D"];
@@ -39,11 +41,11 @@ function formatClock(totalSeconds) {
 export default function TakeExamPage({ params }) {
   const { examId } = use(params);
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error: loadError } = useAsyncData(getFullDb);
   const router = useRouter();
 
   const studentId = session?.id;
-  const exam = db.exams.find((e) => e.id === examId);
+  const exam = db?.exams.find((e) => e.id === examId);
   const studentAttempts = exam
     ? db.attempts.filter((a) => a.examId === exam.id && a.studentId === studentId)
     : [];
@@ -59,23 +61,11 @@ export default function TakeExamPage({ params }) {
   const [confirmingSubmit, setConfirmingSubmit] = useState(false);
   const [violations, setViolations] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(true);
-  const [flaggedIds, setFlaggedIds] = useState([]);
 
   const submittedRef = useRef(false);
   const answersRef = useRef([]);
   const secondsLeftRef = useRef(0);
   const violationsRef = useRef(0);
-  const flaggedIdsRef = useRef([]);
-
-  useEffect(() => {
-    flaggedIdsRef.current = flaggedIds;
-  }, [flaggedIds]);
-
-  function toggleFlag(questionId) {
-    setFlaggedIds((ids) =>
-      ids.includes(questionId) ? ids.filter((id) => id !== questionId) : [...ids, questionId]
-    );
-  }
 
   useEffect(() => {
     answersRef.current = answers;
@@ -93,20 +83,20 @@ export default function TakeExamPage({ params }) {
     requestFullscreen();
   }
 
-  function doSubmit(timeTakenSeconds) {
+  async function doSubmit(timeTakenSeconds) {
     if (submittedRef.current || !exam) return;
     submittedRef.current = true;
     exitFullscreen();
-    const attempt = submitAttempt(
+    const attempt = await submitAttempt(
       exam.id,
       studentId,
       answersRef.current,
       timeTakenSeconds,
-      violationsRef.current,
-      flaggedIdsRef.current
+      violationsRef.current
     );
     const student = db.students.find((s) => s.id === studentId);
-    if (student) sendResultNotification(student, exam, attempt);
+    const center = db.centers.find((c) => c.id === exam.centerId);
+    if (student && center) notifyCenterOfResult(center, student, exam, attempt);
     router.replace(`/student/result/${attempt.id}`);
   }
 
@@ -168,6 +158,16 @@ export default function TakeExamPage({ params }) {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [canTake]);
+
+  if (loading || loadError || !db) {
+    return (
+      <div className={styles.shell}>
+        <div className="container" style={{ paddingTop: 60 }}>
+          <DataState loading={loading} error={loadError} />
+        </div>
+      </div>
+    );
+  }
 
   if (!exam) {
     return (
@@ -280,17 +280,8 @@ export default function TakeExamPage({ params }) {
           </div>
         )}
         <Card className={styles.questionCard}>
-          <div className={styles.qHead}>
-            <div className={styles.qLabel}>
-              Question {currentIndex + 1} of {exam.questions.length}
-            </div>
-            <button
-              type="button"
-              className={`${styles.flagBtn} ${flaggedIds.includes(question.id) ? styles.flagBtnActive : ""}`}
-              onClick={() => toggleFlag(question.id)}
-            >
-              🚩 {flaggedIds.includes(question.id) ? "Flagged" : "Flag this question"}
-            </button>
+          <div className={styles.qLabel}>
+            Question {currentIndex + 1} of {exam.questions.length}
           </div>
           <div className={styles.qText}>{question.text}</div>
 
@@ -345,12 +336,12 @@ export default function TakeExamPage({ params }) {
               {answeredCount} of {exam.questions.length} answered
             </div>
             <div className={styles.qGrid}>
-              {exam.questions.map((q, i) => (
+              {exam.questions.map((_, i) => (
                 <button
                   key={i}
                   className={`${styles.qDot} ${answers[i] !== null ? styles.qDotAnswered : ""} ${
                     i === currentIndex ? styles.qDotCurrent : ""
-                  } ${flaggedIds.includes(q.id) ? styles.qDotFlagged : ""}`}
+                  }`}
                   onClick={() => setCurrentIndex(i)}
                   type="button"
                 >

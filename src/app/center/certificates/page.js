@@ -5,18 +5,34 @@ import DashboardShell from "@/components/dashboard/DashboardShell";
 import { CENTER_NAV } from "@/components/dashboard/navConfig";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import { Input } from "@/components/ui/Field";
 import CertificateDownloadButton from "@/components/certificate/CertificateDownloadButton";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
 import { formatDate, getInitials, toCertId } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function CenterCertificatesPage() {
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error } = useAsyncData(getFullDb);
   const centerId = session?.centerId;
   const [search, setSearch] = useState("");
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell
+        navItems={CENTER_NAV}
+        roleTag="Center owner"
+        userMeta={session?.name}
+        title="Certificates"
+        subtitle="Every certificate your students have earned, in one place."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
 
   const certificates = db.attempts
     .filter((a) => a.centerId === centerId && a.passed)

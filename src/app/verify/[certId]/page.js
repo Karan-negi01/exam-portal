@@ -6,16 +6,30 @@ import FormShell from "@/components/site/FormShell";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
-import { useDB } from "@/lib/useDB";
+import DataState from "@/components/ui/DataState";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
 import { formatDate, toCertId } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function VerifyCertificatePage({ params }) {
   const { certId } = use(params);
   const router = useRouter();
-  const db = useDB();
+  const { data: db, loading, error } = useAsyncData(getFullDb);
 
   const [lookupValue, setLookupValue] = useState(certId || "");
+
+  if (loading || error || !db) {
+    return (
+      <FormShell
+        title="Certificate verification"
+        subtitle="Check whether a CertifyHub certificate is genuine."
+        maxWidth="480px"
+      >
+        <DataState loading={loading} error={error} />
+      </FormShell>
+    );
+  }
 
   const normalized = (certId || "").toUpperCase();
   const attempt = db.attempts.find((a) => toCertId(a.id) === normalized);

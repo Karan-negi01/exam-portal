@@ -8,15 +8,25 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
 import { formatDate, formatDateTime, getInitials } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function StudentDetailPage({ params }) {
   const { studentId } = use(params);
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error } = useAsyncData(getFullDb);
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell navItems={CENTER_NAV} roleTag="Center owner" userMeta={session?.name} title="Loading student…">
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
 
   const student = db.students.find((s) => s.id === studentId && s.centerId === session?.centerId);
 

@@ -6,15 +6,32 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
+import DataState from "@/components/ui/DataState";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
 import { formatDateOnly } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function CenterExamsPage() {
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error } = useAsyncData(getFullDb);
   const centerId = session?.centerId;
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell
+        navItems={CENTER_NAV}
+        roleTag="Center owner"
+        userMeta={session?.name}
+        title="Exams"
+        subtitle="Schedule exams from CertifyHub's question papers and assign your students."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
+
   const exams = db.exams.filter((e) => e.centerId === centerId);
 
   return (

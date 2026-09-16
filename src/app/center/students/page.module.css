@@ -80,13 +80,6 @@
   color: var(--color-primary);
 }
 
-.password {
-  font-family: var(--font-mono);
-  background: var(--color-surface-alt);
-  padding: 3px 8px;
-  border-radius: 6px;
-}
-
 .nameCell {
   font-weight: 600;
 }

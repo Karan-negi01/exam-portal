@@ -49,7 +49,6 @@ export function computeAnalytics(db) {
   db.attempts.forEach((attempt) => {
     const exam = db.exams.find((e) => e.id === attempt.examId);
     if (!exam) return;
-    const flagged = new Set(attempt.flaggedQuestionIds || []);
     exam.questions.forEach((q, i) => {
       const entry = questionStats.get(q.id) || {
         questionId: q.id,
@@ -57,30 +56,20 @@ export function computeAnalytics(db) {
         paperId: exam.questionPaperId,
         correct: 0,
         total: 0,
-        flagCount: 0,
       };
       entry.total += 1;
       if (attempt.answers[i] === q.correctIndex) entry.correct += 1;
-      if (flagged.has(q.id)) entry.flagCount += 1;
       questionStats.set(q.id, entry);
     });
   });
-  const withPaperTitle = (entry) => ({
-    ...entry,
-    paperTitle: db.questionPapers.find((p) => p.id === entry.paperId)?.title || "—",
-  });
   const topMissedQuestions = Array.from(questionStats.values())
     .map((entry) => ({
-      ...withPaperTitle(entry),
+      ...entry,
+      paperTitle: db.questionPapers.find((p) => p.id === entry.paperId)?.title || "—",
       missRate: entry.total ? Math.round(((entry.total - entry.correct) / entry.total) * 100) : 0,
     }))
     .filter((entry) => entry.missRate > 0)
     .sort((a, b) => b.missRate - a.missRate)
-    .slice(0, 8);
-  const topFlaggedQuestions = Array.from(questionStats.values())
-    .map(withPaperTitle)
-    .filter((entry) => entry.flagCount > 0)
-    .sort((a, b) => b.flagCount - a.flagCount)
     .slice(0, 8);
 
   return {
@@ -92,6 +81,5 @@ export function computeAnalytics(db) {
     popularPapers,
     centerStats,
     topMissedQuestions,
-    topFlaggedQuestions,
   };
 }

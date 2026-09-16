@@ -8,15 +8,31 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
+import DataState from "@/components/ui/DataState";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
 import { seatsRemaining, isQuotaExpired, daysUntilExpiry } from "@/lib/pricing";
 import styles from "./page.module.css";
 
 export default function CenterOverviewPage() {
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error } = useAsyncData(getFullDb);
   const centerId = session?.centerId;
+
+  if (loading || error || !db) {
+    return (
+      <DashboardShell
+        navItems={CENTER_NAV}
+        roleTag="Center owner"
+        userMeta={session?.name}
+        title="Center overview"
+        subtitle="Track your students, exams and results at a glance."
+      >
+        <DataState loading={loading} error={error} />
+      </DashboardShell>
+    );
+  }
 
   const center = db.centers.find((c) => c.id === centerId);
   const students = db.students.filter((s) => s.centerId === centerId);

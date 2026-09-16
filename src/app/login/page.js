@@ -7,8 +7,8 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Field, Input, Select } from "@/components/ui/Field";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
-import { getApprovedCenters } from "@/lib/store";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
 import styles from "./page.module.css";
 
 const TABS = [
@@ -54,10 +54,13 @@ function CenterLoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const result = loginCenter(email, password);
+    setSubmitting(true);
+    const result = await loginCenter(email, password);
+    setSubmitting(false);
     if (!result.ok) return setError(result.error);
     router.push("/center");
   }
@@ -71,8 +74,8 @@ function CenterLoginForm() {
       <Field label="Password">
         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
       </Field>
-      <Button type="submit" block size="lg">
-        Log in
+      <Button type="submit" block size="lg" disabled={submitting}>
+        {submitting ? "Logging in…" : "Log in"}
       </Button>
       <div className={styles.demoBox}>
         <b>Demo:</b> owner@brightacademy.com / center123
@@ -84,17 +87,20 @@ function CenterLoginForm() {
 function StudentLoginForm() {
   const { loginStudent } = useAuth();
   const router = useRouter();
-  useDB();
-  const centers = getApprovedCenters();
+  const { data: db } = useAsyncData(getFullDb);
+  const centers = (db?.centers || []).filter((c) => c.status === "approved");
   const [centerId, setCenterId] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!centerId) return setError("Please select your center.");
-    const result = loginStudent(centerId, phone, password);
+    setSubmitting(true);
+    const result = await loginStudent(centerId, phone, password);
+    setSubmitting(false);
     if (!result.ok) return setError(result.error);
     router.push("/student");
   }
@@ -118,8 +124,8 @@ function StudentLoginForm() {
       <Field label="Password">
         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
       </Field>
-      <Button type="submit" block size="lg">
-        Log in
+      <Button type="submit" block size="lg" disabled={submitting}>
+        {submitting ? "Logging in…" : "Log in"}
       </Button>
       <div className={styles.demoBox}>
         <b>Demo:</b> Bright Academy · +91 98111 22334 / K7M2QX
@@ -134,10 +140,13 @@ function AdminLoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const result = loginAdmin(email, password);
+    setSubmitting(true);
+    const result = await loginAdmin(email, password);
+    setSubmitting(false);
     if (!result.ok) return setError(result.error);
     router.push("/admin");
   }
@@ -151,8 +160,8 @@ function AdminLoginForm() {
       <Field label="Password">
         <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
       </Field>
-      <Button type="submit" block size="lg">
-        Log in
+      <Button type="submit" block size="lg" disabled={submitting}>
+        {submitting ? "Logging in…" : "Log in"}
       </Button>
       <div className={styles.demoBox}>
         <b>Demo:</b> admin@examplatform.com / admin123

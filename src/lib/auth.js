@@ -1,11 +1,9 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { findCenterByEmail, findStudentLogin, getCenterById, hydrate } from "./store";
+import { loginAdmin as loginAdminAction, loginCenter as loginCenterAction, loginStudent as loginStudentAction } from "@/actions/auth";
 
 const SESSION_KEY = "examplatform:session";
-const ADMIN_EMAIL = "admin@examplatform.com";
-const ADMIN_PASSWORD = "admin123";
 
 const AuthContext = createContext(null);
 
@@ -27,7 +25,6 @@ export function AuthProvider({ children }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    hydrate();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSession(loadSession());
     setReady(true);
@@ -42,52 +39,35 @@ export function AuthProvider({ children }) {
   }, []);
 
   const loginAdmin = useCallback(
-    (email, password) => {
-      if (email.toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        persist({ role: "admin", id: "admin", name: "Platform Admin" });
-        return { ok: true };
-      }
-      return { ok: false, error: "Invalid admin email or password." };
+    async (email, password) => {
+      const result = await loginAdminAction(email, password);
+      if (!result.ok) return result;
+      persist({ role: "admin", id: "admin", name: "Platform Admin" });
+      return { ok: true };
     },
     [persist]
   );
 
   const loginCenter = useCallback(
-    (email, password) => {
-      const center = findCenterByEmail(email);
-      if (!center || center.password !== password) {
-        return { ok: false, error: "Invalid email or password." };
-      }
-      if (center.status === "pending") {
-        return { ok: false, error: "Your center is still awaiting admin approval." };
-      }
-      if (center.status === "rejected") {
-        return { ok: false, error: "Your center application was not approved." };
-      }
-      if (center.status === "suspended") {
-        return { ok: false, error: "Your center has been suspended. Contact CertifyHub support." };
-      }
-      persist({ role: "center", id: center.id, name: center.name, centerId: center.id });
+    async (email, password) => {
+      const result = await loginCenterAction(email, password);
+      if (!result.ok) return result;
+      persist({ role: "center", id: result.center.id, name: result.center.name, centerId: result.center.id });
       return { ok: true };
     },
     [persist]
   );
 
   const loginStudent = useCallback(
-    (centerId, phone, password) => {
-      const center = getCenterById(centerId);
-      if (!center) return { ok: false, error: "Please select your center." };
-      if (center.status === "suspended") {
-        return { ok: false, error: "This center's account is currently inactive." };
-      }
-      const student = findStudentLogin(centerId, phone, password);
-      if (!student) return { ok: false, error: "Invalid phone number or password." };
+    async (centerId, phone, password) => {
+      const result = await loginStudentAction(centerId, phone, password);
+      if (!result.ok) return result;
       persist({
         role: "student",
-        id: student.id,
-        name: student.name,
-        centerId: center.id,
-        centerName: center.name,
+        id: result.student.id,
+        name: result.student.name,
+        centerId: result.center.id,
+        centerName: result.center.name,
       });
       return { ok: true };
     },

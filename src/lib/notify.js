@@ -3,10 +3,12 @@ export function sendStudentCredentialsSms(student) {
   return { ok: true, sentTo: student.phone };
 }
 
-// No SMS/WhatsApp gateway is wired up yet — this simulates a successful delivery for the demo.
-export function sendResultNotification(student, exam, attempt) {
+// No SMS/email gateway is wired up yet — this simulates notifying the center the
+// moment a student's result comes in. Students are never sent their own result —
+// only the center sees it, and decides when to share it (and the certificate).
+export function notifyCenterOfResult(center, student, exam, attempt) {
   const message = attempt.passed
-    ? `Congrats ${student.name}! You passed ${exam.title} with ${attempt.score}/${attempt.totalMarks}. Contact your center to collect your certificate.`
-    : `Your result for ${exam.title} is ready: ${attempt.score}/${attempt.totalMarks} (not passed). Contact your center for next steps.`;
-  return { ok: true, sentTo: student.phone, message };
+    ? `${student.name} passed ${exam.title} (${attempt.score}/${attempt.totalMarks}). Certificate is ready to download.`
+    : `${student.name} did not pass ${exam.title} (${attempt.score}/${attempt.totalMarks}).`;
+  return { ok: true, sentTo: center.email, message };
 }

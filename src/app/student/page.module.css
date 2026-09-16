@@ -73,3 +73,12 @@
   align-items: center;
   gap: 14px;
 }
+
+.submittedTag {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  background: var(--color-surface-alt);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+}

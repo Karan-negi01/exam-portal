@@ -7,7 +7,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
 import { useAuth } from "@/lib/auth";
-import { changeStudentPassword } from "@/lib/store";
+import { changeStudentPassword } from "@/actions/students";
 import styles from "./page.module.css";
 
 export default function StudentSettingsPage() {
@@ -18,7 +18,7 @@ export default function StudentSettingsPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -26,7 +26,7 @@ export default function StudentSettingsPage() {
       setError("New password and confirmation don't match.");
       return;
     }
-    const result = changeStudentPassword(session.id, currentPassword, newPassword);
+    const result = await changeStudentPassword(session.id, currentPassword, newPassword);
     if (!result.ok) {
       setError(result.error);
       return;

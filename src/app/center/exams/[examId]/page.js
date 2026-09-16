@@ -10,25 +10,35 @@ import Button from "@/components/ui/Button";
 import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import DataState from "@/components/ui/DataState";
 import CertificateDownloadButton from "@/components/certificate/CertificateDownloadButton";
 import { useAuth } from "@/lib/auth";
-import { useDB } from "@/lib/useDB";
-import { publishExam, deleteExam, grantRetake } from "@/lib/store";
+import { useAsyncData } from "@/lib/useAsyncData";
+import { getFullDb } from "@/actions/db";
+import { publishExam, deleteExam, grantRetake } from "@/actions/exams";
 import { formatDate, formatDateOnly, formatDateTime, getInitials, toCertId } from "@/lib/ids";
 import styles from "./page.module.css";
 
 export default function ExamDetailPage({ params }) {
   const { examId } = use(params);
   const { session } = useAuth();
-  const db = useDB();
+  const { data: db, loading, error: loadError, refresh } = useAsyncData(getFullDb);
   const router = useRouter();
-
-  const exam = db.exams.find((e) => e.id === examId && e.centerId === session?.centerId);
-  const students = db.students.filter((s) => s.centerId === session?.centerId);
 
   const [selectedIds, setSelectedIds] = useState([]);
   const [publishError, setPublishError] = useState("");
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  if (loading || loadError || !db) {
+    return (
+      <DashboardShell navItems={CENTER_NAV} roleTag="Center owner" userMeta={session?.name} title="Loading exam…">
+        <DataState loading={loading} error={loadError} />
+      </DashboardShell>
+    );
+  }
+
+  const exam = db.exams.find((e) => e.id === examId && e.centerId === session?.centerId);
+  const students = db.students.filter((s) => s.centerId === session?.centerId);
 
   if (!exam) {
     return (
@@ -44,18 +54,24 @@ export default function ExamDetailPage({ params }) {
     setSelectedIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
   }
 
-  function handlePublish() {
+  async function handlePublish() {
     if (selectedIds.length === 0) {
       setPublishError("Select at least one student to assign this exam to.");
       return;
     }
     setPublishError("");
-    publishExam(exam.id, selectedIds);
+    await publishExam(exam.id, selectedIds);
+    refresh();
   }
 
-  function handleDelete() {
-    deleteExam(exam.id);
+  async function handleDelete() {
+    await deleteExam(exam.id);
     router.push("/center/exams");
+  }
+
+  async function handleGrantRetake(studentId) {
+    await grantRetake(exam.id, studentId);
+    refresh();
   }
 
   return (
@@ -226,7 +242,7 @@ export default function ExamDetailPage({ params }) {
                               <Button
                                 size="sm"
                                 variant="secondary"
-                                onClick={() => grantRetake(exam.id, studentId)}
+                                onClick={() => handleGrantRetake(studentId)}
                               >
                                 Allow retake
                               </Button>

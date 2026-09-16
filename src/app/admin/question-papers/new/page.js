@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { ADMIN_NAV } from "@/components/dashboard/navConfig";
 import QuestionPaperForm from "@/components/admin/QuestionPaperForm";
-import { createQuestionPaper } from "@/lib/store";
+import { createQuestionPaper } from "@/actions/questionPapers";
 
 export default function NewQuestionPaperPage() {
   const router = useRouter();
@@ -20,8 +20,8 @@ export default function NewQuestionPaperPage() {
       <QuestionPaperForm
         submitLabel="Save question paper"
         onCancel={() => router.push("/admin/question-papers")}
-        onSubmit={(data) => {
-          createQuestionPaper(data);
+        onSubmit={async (data) => {
+          await createQuestionPaper(data);
           router.push("/admin/question-papers");
         }}
       />
