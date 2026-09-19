@@ -7,7 +7,7 @@
 
 .top {
   display: grid;
-  grid-template-columns: 1.4fr repeat(3, 1fr);
+  grid-template-columns: 1.4fr repeat(4, 1fr);
   gap: 32px;
   padding-bottom: 40px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -75,7 +75,7 @@
   color: #6f6889;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .top {
     grid-template-columns: 1fr 1fr;
   }

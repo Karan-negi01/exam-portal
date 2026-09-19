@@ -43,6 +43,15 @@ export default function SiteFooter() {
               <span>Mon–Sat, 10am–7pm IST</span>
             </div>
           </div>
+
+          <div>
+            <div className={styles.colTitle}>Legal</div>
+            <div className={styles.colLinks}>
+              <Link href="/privacy">Privacy Policy</Link>
+              <Link href="/terms">Terms &amp; Conditions</Link>
+              <Link href="/refund-policy">Refund &amp; Cancellation</Link>
+            </div>
+          </div>
         </div>
 
         <div className={styles.bottom}>
