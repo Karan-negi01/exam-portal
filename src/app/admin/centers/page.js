@@ -58,7 +58,7 @@ export default function AdminCentersPage() {
         roleTag="Platform admin"
         userMeta="Full platform access"
         title="Centers"
-        subtitle="Every center that has applied to list on CertifyHub."
+        subtitle="Every center that has applied to list on Skorex."
       >
         <DataState loading={loading} error={error} />
       </DashboardShell>
@@ -81,7 +81,7 @@ export default function AdminCentersPage() {
       roleTag="Platform admin"
       userMeta="Full platform access"
       title="Centers"
-      subtitle="Every center that has applied to list on CertifyHub."
+      subtitle="Every center that has applied to list on Skorex."
     >
       <div className={styles.toolbar}>
         <div className={styles.filters}>

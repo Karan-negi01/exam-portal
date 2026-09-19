@@ -20,7 +20,7 @@ export default function SiteHeader() {
       <div className={`container ${styles.bar}`}>
         <Link href="/" className={styles.brand}>
           <span className={styles.brandMark}>🎓</span>
-          CertifyHub
+          Skorex
         </Link>
 
         <nav className={styles.nav}>

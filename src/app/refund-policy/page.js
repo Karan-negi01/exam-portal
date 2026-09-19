@@ -1,8 +1,8 @@
 import LegalPage from "@/components/site/LegalPage";
 
 export const metadata = {
-  title: "Refund & Cancellation Policy — CertifyHub",
-  description: "CertifyHub's policy on Seat Pack refunds and cancellations for training centers.",
+  title: "Refund & Cancellation Policy — Skorex",
+  description: "Skorex's policy on Seat Pack refunds and cancellations for training centers.",
 };
 
 export default function RefundPolicyPage() {
@@ -13,7 +13,7 @@ export default function RefundPolicyPage() {
       intro={
         <p>
           This Refund &amp; Cancellation Policy explains how refunds and cancellations are
-          handled for Seat Pack purchases made on the CertifyHub platform (the &ldquo;Platform&rdquo;).
+          handled for Seat Pack purchases made on the Skorex platform (the &ldquo;Platform&rdquo;).
           It forms part of our <a href="/terms">Terms &amp; Conditions</a>.
         </p>
       }
@@ -41,8 +41,8 @@ export default function RefundPolicyPage() {
         <p>A refund may be considered in the following situations:</p>
         <ul>
           <li>A duplicate or accidental payment was made for the same Seat Pack purchase</li>
-          <li>A technical error on CertifyHub&apos;s end resulted in a charge without the corresponding seats being credited to the center&apos;s account</li>
-          <li>A center&apos;s application is rejected by CertifyHub&apos;s admin team after payment was already collected</li>
+          <li>A technical error on Skorex&apos;s end resulted in a charge without the corresponding seats being credited to the center&apos;s account</li>
+          <li>A center&apos;s application is rejected by Skorex&apos;s admin team after payment was already collected</li>
         </ul>
       </section>
 
@@ -61,7 +61,7 @@ export default function RefundPolicyPage() {
         <h2>5. How to Request a Refund</h2>
         <p>
           To request a refund, contact us at{" "}
-          <a href="mailto:hello@certifyhub.app">hello@certifyhub.app</a> within 7 days of the
+          <a href="mailto:hello@skorex.in">hello@skorex.in</a> within 7 days of the
           payment, with your center name, registered email, and the payment reference. We will
           review the request and respond within 5 business days.
         </p>

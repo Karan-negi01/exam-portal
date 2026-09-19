@@ -14,7 +14,7 @@ export default function Hero() {
             <span className={styles.titleAccent}>Without the paperwork.</span>
           </h1>
           <p className={styles.subtitle}>
-            CertifyHub is where verified training centers enroll students, run timed MCQ exams
+            Skorex is where verified training centers enroll students, run timed MCQ exams
             online, and generate professional certificates — every result auto-graded, every
             certificate ready in seconds.
           </p>

@@ -25,7 +25,7 @@ export default function CenterExamsPage() {
         roleTag="Center owner"
         userMeta={session?.name}
         title="Exams"
-        subtitle="Schedule exams from CertifyHub's question papers and assign your students."
+        subtitle="Schedule exams from Skorex's question papers and assign your students."
       >
         <DataState loading={loading} error={error} />
       </DashboardShell>
@@ -40,7 +40,7 @@ export default function CenterExamsPage() {
       roleTag="Center owner"
       userMeta={session?.name}
       title="Exams"
-      subtitle="Schedule exams from CertifyHub's question papers and assign your students."
+      subtitle="Schedule exams from Skorex's question papers and assign your students."
       actions={
         <Button href="/center/exams/new" size="sm">
           + Schedule exam

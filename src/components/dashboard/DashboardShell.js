@@ -21,7 +21,7 @@ export default function DashboardShell({ navItems, roleTag, userMeta, title, sub
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
           <span className={styles.brandMark}>🎓</span>
-          CertifyHub
+          Skorex
         </div>
         <div className={styles.roleTag}>{roleTag}</div>
 

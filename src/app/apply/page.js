@@ -150,7 +150,7 @@ export default function ApplyPage() {
 
   return (
     <FormShell
-      title="List your center on CertifyHub"
+      title="List your center on Skorex"
       subtitle="Tell us about your center. Our admin team verifies every application."
       maxWidth="560px"
     >

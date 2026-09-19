@@ -21,7 +21,7 @@ export default function LoginPage() {
   const [tab, setTab] = useState("center");
 
   return (
-    <FormShell title="Welcome back" subtitle="Log in to your CertifyHub dashboard" maxWidth="440px">
+    <FormShell title="Welcome back" subtitle="Log in to your Skorex dashboard" maxWidth="440px">
       <Card>
         <div className={styles.tabs}>
           {TABS.map((t) => (

@@ -28,7 +28,7 @@ const CertificateTemplate = forwardRef(function CertificateTemplate(
 
         <div className={styles.brand}>
           <span className={styles.brandMark}>🎓</span>
-          CertifyHub
+          Skorex
         </div>
         <div className={styles.kicker}>Certificate of Completion</div>
         <h1 className={styles.heading}>{examTitle}</h1>
@@ -39,7 +39,7 @@ const CertificateTemplate = forwardRef(function CertificateTemplate(
         <p className={styles.body}>
           for successfully completing the examination in{" "}
           <span className={styles.examTitle}>{subject}</span>, conducted by{" "}
-          <span className={styles.examTitle}>{centerName}</span>, and issued on the CertifyHub
+          <span className={styles.examTitle}>{centerName}</span>, and issued on the Skorex
           platform on {dateStr}.
         </p>
 
@@ -57,7 +57,7 @@ const CertificateTemplate = forwardRef(function CertificateTemplate(
           </div>
           <div className={styles.seal}>🏅</div>
           <div className={styles.sign}>
-            <div className={styles.signLine}>CertifyHub</div>
+            <div className={styles.signLine}>Skorex</div>
             <div>Platform</div>
           </div>
         </div>

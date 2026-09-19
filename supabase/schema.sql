@@ -1,4 +1,4 @@
--- CertifyHub schema
+-- Skorex schema
 -- Run this once in the Supabase SQL editor (Project -> SQL Editor -> New query)
 -- against a fresh project.
 

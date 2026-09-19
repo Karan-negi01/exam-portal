@@ -1,8 +1,8 @@
 import LegalPage from "@/components/site/LegalPage";
 
 export const metadata = {
-  title: "Privacy Policy — CertifyHub",
-  description: "How CertifyHub collects, uses and protects information from training centers and students.",
+  title: "Privacy Policy — Skorex",
+  description: "How Skorex collects, uses and protects information from training centers and students.",
 };
 
 export default function PrivacyPolicyPage() {
@@ -13,8 +13,8 @@ export default function PrivacyPolicyPage() {
       intro={
         <>
           <p>
-            CertifyHub (&ldquo;CertifyHub&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;)
-            operates the platform available at certifyhub.app (the &ldquo;Platform&rdquo;), which
+            Skorex (&ldquo;Skorex&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;)
+            operates the platform available at skorex.in (the &ldquo;Platform&rdquo;), which
             allows training centers to enroll students, conduct online MCQ exams, and issue
             certificates. This Privacy Policy explains what information we collect, how we use
             it, and the choices you have.
@@ -108,7 +108,7 @@ export default function PrivacyPolicyPage() {
           <li>Withdraw consent where processing is based on consent</li>
         </ul>
         <p>
-          To exercise these rights, contact us at <a href="mailto:hello@certifyhub.app">hello@certifyhub.app</a>.
+          To exercise these rights, contact us at <a href="mailto:hello@skorex.in">hello@skorex.in</a>.
         </p>
       </section>
 
@@ -143,7 +143,7 @@ export default function PrivacyPolicyPage() {
         <h2>10. Contact Us</h2>
         <p>For any questions about this Privacy Policy, contact us at:</p>
         <p>
-          Email: <a href="mailto:hello@certifyhub.app">hello@certifyhub.app</a>
+          Email: <a href="mailto:hello@skorex.in">hello@skorex.in</a>
           <br />
           Hours: Mon–Sat, 10am–7pm IST
         </p>

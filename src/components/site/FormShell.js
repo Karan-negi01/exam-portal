@@ -16,7 +16,7 @@ export default function FormShell({ title, subtitle, maxWidth, children }) {
 
         <Link href="/" className={styles.brand}>
           <span className={styles.brandMark}>🎓</span>
-          CertifyHub
+          Skorex
         </Link>
 
         <div className={styles.sideBody}>
@@ -34,14 +34,14 @@ export default function FormShell({ title, subtitle, maxWidth, children }) {
           </div>
         </div>
 
-        <div className={styles.sideFoot}>© {new Date().getFullYear()} CertifyHub</div>
+        <div className={styles.sideFoot}>© {new Date().getFullYear()} Skorex</div>
       </aside>
 
       <div className={styles.wrap}>
         <div className={styles.card} style={maxWidth ? { "--card-max": maxWidth } : undefined}>
           <Link href="/" className={styles.mobileBrand}>
             <span className={styles.brandMark}>🎓</span>
-            CertifyHub
+            Skorex
           </Link>
 
           {(title || subtitle) && (

@@ -21,7 +21,7 @@ export default function VerifyLookupPage() {
   return (
     <FormShell
       title="Certificate verification"
-      subtitle="Check whether a CertifyHub certificate is genuine."
+      subtitle="Check whether a Skorex certificate is genuine."
       maxWidth="480px"
     >
       <Card>

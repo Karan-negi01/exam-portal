@@ -23,7 +23,7 @@ export default function VerifyCertificatePage({ params }) {
     return (
       <FormShell
         title="Certificate verification"
-        subtitle="Check whether a CertifyHub certificate is genuine."
+        subtitle="Check whether a Skorex certificate is genuine."
         maxWidth="480px"
       >
         <DataState loading={loading} error={error} />
@@ -49,7 +49,7 @@ export default function VerifyCertificatePage({ params }) {
   return (
     <FormShell
       title="Certificate verification"
-      subtitle="Check whether a CertifyHub certificate is genuine."
+      subtitle="Check whether a Skorex certificate is genuine."
       maxWidth="480px"
     >
       <Card>
@@ -75,7 +75,7 @@ export default function VerifyCertificatePage({ params }) {
                 <span className={styles.statusIcon}>✅</span>
                 <div>
                   <div className={styles.statusTitle}>Certificate verified</div>
-                  <div className={styles.statusSub}>This is a genuine CertifyHub certificate.</div>
+                  <div className={styles.statusSub}>This is a genuine Skorex certificate.</div>
                 </div>
               </div>
               <div className={styles.detailGrid}>

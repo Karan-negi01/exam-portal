@@ -21,7 +21,7 @@ const ROLES = [
     points: [
       "List your center, choose a Seat Pack, and get verified",
       "Enroll students — each gets their own ID and password",
-      "Schedule exams from CertifyHub's ready-made question papers",
+      "Schedule exams from Skorex's ready-made question papers",
       "Download certificates for every student who passes",
     ],
     link: "/apply",

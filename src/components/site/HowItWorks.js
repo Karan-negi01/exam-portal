@@ -11,7 +11,7 @@ const STEPS = [
     num: "02",
     tag: "Center owner",
     title: "Schedule exams & enroll students",
-    desc: "Add students to get them individual login IDs and passwords. Pick one of CertifyHub's ready-made question papers, set a date, and assign it to your students.",
+    desc: "Add students to get them individual login IDs and passwords. Pick one of Skorex's ready-made question papers, set a date, and assign it to your students.",
   },
   {
     num: "03",

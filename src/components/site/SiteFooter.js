@@ -9,7 +9,7 @@ export default function SiteFooter() {
           <div>
             <div className={styles.brand}>
               <span className={styles.brandMark}>🎓</span>
-              CertifyHub
+              Skorex
             </div>
             <p className={styles.blurb}>
               The exam and certification platform for training centers — verify centers, run
@@ -39,7 +39,7 @@ export default function SiteFooter() {
           <div>
             <div className={styles.colTitle}>Contact</div>
             <div className={styles.colLinks}>
-              <a href="mailto:hello@certifyhub.app">hello@certifyhub.app</a>
+              <a href="mailto:hello@skorex.in">hello@skorex.in</a>
               <span>Mon–Sat, 10am–7pm IST</span>
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function SiteFooter() {
         </div>
 
         <div className={styles.bottom}>
-          <span>© {new Date().getFullYear()} CertifyHub. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Skorex. All rights reserved.</span>
           <span>Built for training centers across India</span>
         </div>
       </div>

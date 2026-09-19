@@ -15,7 +15,7 @@ const FAQS = [
   },
   {
     q: "Who creates the question papers?",
-    a: "CertifyHub does. Our team prepares MCQ question papers for every subject, each with its own timer and passing marks already set. Centers simply pick a paper, choose an exam date, and assign it to their students.",
+    a: "Skorex does. Our team prepares MCQ question papers for every subject, each with its own timer and passing marks already set. Centers simply pick a paper, choose an exam date, and assign it to their students.",
   },
   {
     q: "How are certificates generated?",

@@ -36,7 +36,7 @@ export default function NewExamPage() {
         roleTag="Center owner"
         userMeta={session?.name}
         title="Schedule an exam"
-        subtitle="Question papers are prepared by CertifyHub — just pick one, set a date, and assign your students."
+        subtitle="Question papers are prepared by Skorex — just pick one, set a date, and assign your students."
       >
         <DataState loading={loading} error={loadError} />
       </DashboardShell>
@@ -61,7 +61,7 @@ export default function NewExamPage() {
       roleTag="Center owner"
       userMeta={session?.name}
       title="Schedule an exam"
-      subtitle="Question papers are prepared by CertifyHub — just pick one, set a date, and assign your students."
+      subtitle="Question papers are prepared by Skorex — just pick one, set a date, and assign your students."
     >
       <form onSubmit={handleSubmit}>
         {error && <div className={styles.formError}>{error}</div>}
@@ -69,7 +69,7 @@ export default function NewExamPage() {
         <div className={styles.section}>
           <h2 className={styles.sectionTitle}>1. Choose a question paper</h2>
           <p className={styles.sectionSub}>
-            These are built and maintained by the CertifyHub team. Each time you schedule a paper,
+            These are built and maintained by the Skorex team. Each time you schedule a paper,
             a fresh random set of questions is drawn from its question bank.
           </p>
 
@@ -78,7 +78,7 @@ export default function NewExamPage() {
               <EmptyState
                 icon="📚"
                 title="No question papers available yet"
-                description="Ask CertifyHub to publish a paper for your subject, then come back here."
+                description="Ask Skorex to publish a paper for your subject, then come back here."
               />
             </Card>
           ) : (

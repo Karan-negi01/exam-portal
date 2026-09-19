@@ -32,7 +32,7 @@ export async function loginCenter(email, password) {
     return { ok: false, error: "Your center application was not approved." };
   }
   if (center.status === "suspended") {
-    return { ok: false, error: "Your center has been suspended. Contact CertifyHub support." };
+    return { ok: false, error: "Your center has been suspended. Contact Skorex support." };
   }
   return { ok: true, center: { id: center.id, name: center.name } };
 }

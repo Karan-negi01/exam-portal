@@ -27,9 +27,9 @@ const manrope = Manrope({
 });
 
 export const metadata = {
-  title: "CertifyHub — Exam & Certification Platform for Training Centers",
+  title: "Skorex — Exam & Certification Platform for Training Centers",
   description:
-    "CertifyHub lets training centers list on our platform, enroll students, run MCQ exams online, and issue verified certificates — all from one dashboard.",
+    "Skorex lets training centers list on our platform, enroll students, run MCQ exams online, and issue verified certificates — all from one dashboard.",
 };
 
 export default function RootLayout({ children }) {

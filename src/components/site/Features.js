@@ -17,7 +17,7 @@ const FEATURES = [
     icon: "📚",
     tone: "iconGreen",
     title: "Ready-made question papers",
-    text: "CertifyHub prepares the MCQ question papers for every subject — centers just pick one, set a date, and assign students.",
+    text: "Skorex prepares the MCQ question papers for every subject — centers just pick one, set a date, and assign students.",
   },
   {
     icon: "⏱️",
