@@ -16,6 +16,7 @@ create table if not exists centers (
   location text not null,
   course_types text[] not null default '{}',
   pan_card_name text,
+  pan_card_path text,
   status text not null default 'pending' check (status in ('pending', 'approved', 'suspended', 'rejected')),
   seats int not null default 0,
   price_per_seat int not null default 200,
@@ -132,3 +133,9 @@ alter table exam_questions enable row level security;
 alter table exam_assigned_students enable row level security;
 alter table exam_retakes_granted enable row level security;
 alter table attempts enable row level security;
+
+-- ---------- Storage ----------
+-- The "pan-cards" bucket (created by scripts/setup-storage.mjs) holds the actual
+-- uploaded PAN card files. It is private -- admins view a file via a short-lived
+-- signed URL generated server-side (see actions/centers.js: getPanCardUrl), never
+-- a public URL.

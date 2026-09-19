@@ -25,7 +25,7 @@
 .primary {
   background: var(--color-primary);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.28);
+  box-shadow: 0 10px 24px var(--color-primary-shadow, rgba(79, 70, 229, 0.28));
 }
 .primary:hover:not(:disabled) {
   background: var(--color-primary-dark);

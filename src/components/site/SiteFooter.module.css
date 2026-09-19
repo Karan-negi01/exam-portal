@@ -1,7 +1,7 @@
 .footer {
-  background: var(--color-ink);
-  color: #cbd5e1;
-  margin-top: 80px;
+  background: #1a1530;
+  color: #c8c2de;
+  margin-top: 0;
   padding: 60px 0 28px;
 }
 
@@ -17,17 +17,18 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-weight: 800;
+  font-family: var(--font-display);
+  font-weight: 700;
   font-size: 1.15rem;
   color: #fff;
   margin-bottom: 12px;
 }
 
 .brandMark {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--color-primary), #818cf8);
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,7 +36,7 @@
 
 .blurb {
   font-size: 0.9rem;
-  color: #94a3b8;
+  color: #948dae;
   max-width: 300px;
   line-height: 1.6;
 }
@@ -56,7 +57,7 @@
 
 .colLinks a {
   font-size: 0.88rem;
-  color: #94a3b8;
+  color: #948dae;
   transition: color 0.15s ease;
 }
 .colLinks a:hover {
@@ -71,7 +72,7 @@
   gap: 10px;
   padding-top: 22px;
   font-size: 0.82rem;
-  color: #64748b;
+  color: #6f6889;
 }
 
 @media (max-width: 760px) {

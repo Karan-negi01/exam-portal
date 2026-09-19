@@ -19,6 +19,7 @@ export default function AdminQuestionPapersPage() {
   const [deleting, setDeleting] = useState(null);
 
   async function handleConfirmDelete() {
+    if (!deleting) return;
     await deleteQuestionPaper(deleting.id);
     setDeleting(null);
     refresh();

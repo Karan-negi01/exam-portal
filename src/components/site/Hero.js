@@ -4,15 +4,14 @@ import styles from "./Hero.module.css";
 export default function Hero() {
   return (
     <section className={styles.hero}>
-      <div className={styles.glow} />
-      <div className={styles.glow2} />
+      <div className={styles.blobPrimary} />
+      <div className={styles.blobAccent} />
       <div className={`container ${styles.grid}`}>
         <div>
           <span className={styles.eyebrow}>✦ Built for offline training centers</span>
           <h1 className={styles.title}>
-            Run exams. Issue certificates.
-            <br />
-            <span className={styles.titleAccent}>All without the paperwork.</span>
+            Run exams. Issue certificates.{" "}
+            <span className={styles.titleAccent}>Without the paperwork.</span>
           </h1>
           <p className={styles.subtitle}>
             CertifyHub is where verified training centers enroll students, run timed MCQ exams
@@ -42,7 +41,7 @@ export default function Hero() {
 
         <div className={styles.visual}>
           <div className={styles.mockCard}>
-            <div className={styles.mockHeader}>
+            <div className={styles.mockCardBar}>
               <div className={styles.mockDots}>
                 <span />
                 <span />
@@ -51,35 +50,44 @@ export default function Hero() {
               <span className={styles.mockBadge}>Exam closed</span>
             </div>
 
-            <div className={styles.mockRow}>
-              <span className={styles.mockRowLabel}>
-                <span className={styles.mockAvatar}>AI</span>
-                Ananya Iyer
-              </span>
-              <span className={`${styles.mockScore} ${styles.pass}`}>8/10 · Pass</span>
-            </div>
-            <div className={styles.mockRow}>
-              <span className={styles.mockRowLabel}>
-                <span className={styles.mockAvatar}>VS</span>
-                Vikram Singh
-              </span>
-              <span className={`${styles.mockScore} ${styles.fail}`}>4/10 · Fail</span>
-            </div>
-            <div className={styles.mockRow}>
-              <span className={styles.mockRowLabel}>
-                <span className={styles.mockAvatar}>FS</span>
-                Fatima Sheikh
-              </span>
-              <span className={styles.mockScore} style={{ color: "var(--color-muted)" }}>
-                Not attempted
-              </span>
+            <div className={styles.mockBody}>
+              <div className={styles.mockRow}>
+                <span className={styles.mockRowLabel}>
+                  <span className={styles.mockAvatar}>AI</span>
+                  Ananya Iyer
+                </span>
+                <span className={`${styles.mockScore} ${styles.pass}`}>8/10 · Pass</span>
+              </div>
+              <div className={styles.mockRow}>
+                <span className={styles.mockRowLabel}>
+                  <span className={styles.mockAvatar}>VS</span>
+                  Vikram Singh
+                </span>
+                <span className={`${styles.mockScore} ${styles.fail}`}>4/10 · Fail</span>
+              </div>
+              <div className={styles.mockRow}>
+                <span className={styles.mockRowLabel}>
+                  <span className={styles.mockAvatar}>FS</span>
+                  Fatima Sheikh
+                </span>
+                <span className={styles.mockScore} style={{ color: "var(--color-muted)" }}>
+                  Not attempted
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className={styles.floatCert}>
-            <div className={styles.floatCertTop}>🏅 CERTIFICATE</div>
-            <div className={styles.floatCertName}>Ananya Iyer</div>
-            <div className={styles.floatCertSub}>Tally ERP 9 Foundation · Bright Academy</div>
+          <div className={styles.chipCert}>
+            <span className={styles.chipEmoji}>🏅</span>
+            <div>
+              <div className={styles.chipTitle}>Certificate ready</div>
+              <div className={styles.chipSub}>Ananya Iyer · Tally ERP 9</div>
+            </div>
+          </div>
+
+          <div className={styles.chipVerified}>
+            <span className={styles.chipDot} />
+            Center verified by admin
           </div>
         </div>
       </div>

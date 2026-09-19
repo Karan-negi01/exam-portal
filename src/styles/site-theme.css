@@ -1,0 +1,47 @@
+/* Marketing-site theme — scoped to `.site` (the public homepage) only.
+   Overrides the shared design tokens locally via CSS variable cascade, so
+   Button/Card/etc. pick up the new palette inside this wrapper while every
+   dashboard, login and apply page elsewhere keeps the original tokens. */
+
+.site {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  --radius-full: 999px;
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+
+  --color-primary: #5433e0;
+  --color-primary-dark: #4023b8;
+  --color-primary-light: #efeafd;
+  --color-primary-shadow: rgba(84, 51, 224, 0.32);
+
+  --color-accent: #ff6a3d;
+  --color-accent-dark: #e8511f;
+  --color-accent-light: #ffe4d8;
+
+  --color-success: #17944f;
+  --color-success-light: #e2f5ea;
+  --color-danger: #e0402b;
+  --color-danger-light: #fde6e2;
+  --color-warning: #e8511f;
+  --color-warning-light: #ffe4d8;
+
+  --color-ink: #16132b;
+  --color-ink-soft: #5c5675;
+  --color-muted: #948fab;
+  --color-border: #e7e2f5;
+  --color-border-soft: #f1eefb;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f7f5fd;
+  --color-bg: #fdfcff;
+
+  --font-sans: var(--font-site-body), "Segoe UI", system-ui, sans-serif;
+  --font-display: var(--font-site-display), var(--font-site-body), system-ui, sans-serif;
+
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}

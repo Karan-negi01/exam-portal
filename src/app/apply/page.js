@@ -37,6 +37,7 @@ const EMPTY = {
 
 export default function ApplyPage() {
   const [form, setForm] = useState(EMPTY);
+  const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState("");
@@ -88,12 +89,15 @@ export default function ApplyPage() {
     setPaying(true);
     // Razorpay isn't wired up yet — this simulates a successful payment for the demo.
     setTimeout(async () => {
-      const result = await applyForCenter({
-        ...form,
-        courseTypes: finalCourseTypes,
-        seats: Number(form.seats),
-        panCardName: fileName || null,
-      });
+      const result = await applyForCenter(
+        {
+          ...form,
+          courseTypes: finalCourseTypes,
+          seats: Number(form.seats),
+          panCardName: fileName || null,
+        },
+        file
+      );
       setPaying(false);
       if (!result.ok) {
         setFormError(result.error);
@@ -238,7 +242,11 @@ export default function ApplyPage() {
                 type="file"
                 hidden
                 accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) => setFileName(e.target.files?.[0]?.name || "")}
+                onChange={(e) => {
+                  const f = e.target.files?.[0] || null;
+                  setFile(f);
+                  setFileName(f?.name || "");
+                }}
               />
               {fileName ? (
                 <div className={styles.fileName}>📎 {fileName}</div>

@@ -6,10 +6,20 @@ import { centerPrefix } from "@/lib/ids";
 import { PRICE_PER_SEAT, oneYearFromNow } from "@/lib/pricing";
 import { mapCenter } from "./mappers";
 
-export async function applyForCenter(data) {
+export async function applyForCenter(data, panCardFile) {
   const supabase = getSupabaseServerClient();
   const now = new Date().toISOString();
   const passwordHash = await bcrypt.hash(data.password, 10);
+
+  let panCardPath = null;
+  if (panCardFile) {
+    const ext = panCardFile.name.split(".").pop();
+    panCardPath = `${crypto.randomUUID()}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("pan-cards")
+      .upload(panCardPath, panCardFile, { contentType: panCardFile.type });
+    if (uploadError) throw new Error(uploadError.message);
+  }
 
   const { data: row, error } = await supabase
     .from("centers")
@@ -23,6 +33,7 @@ export async function applyForCenter(data) {
       location: data.location,
       course_types: data.courseTypes || [],
       pan_card_name: data.panCardName || null,
+      pan_card_path: panCardPath,
       status: "pending",
       created_at: now,
       seats: data.seats,
@@ -40,6 +51,24 @@ export async function applyForCenter(data) {
     throw new Error(error.message);
   }
   return { ok: true, center: mapCenter(row) };
+}
+
+export async function getPanCardUrl(centerId) {
+  const supabase = getSupabaseServerClient();
+  const { data: center, error } = await supabase
+    .from("centers")
+    .select("pan_card_path")
+    .eq("id", centerId)
+    .single();
+  if (error || !center?.pan_card_path) {
+    return { ok: false, error: "No PAN card is on file for this center." };
+  }
+
+  const { data, error: urlError } = await supabase.storage
+    .from("pan-cards")
+    .createSignedUrl(center.pan_card_path, 300);
+  if (urlError) return { ok: false, error: urlError.message };
+  return { ok: true, url: data.signedUrl };
 }
 
 export async function addSeats(centerId, additionalSeats) {

@@ -65,6 +65,31 @@
   font-weight: 600;
 }
 
+.proofLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.proofLink:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.proofLink:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .actions {
   display: flex;
   align-items: flex-start;

@@ -9,7 +9,7 @@ import FAQSection from "@/components/site/FAQSection";
 
 export default function Home() {
   return (
-    <>
+    <div className="site">
       <SiteHeader />
       <main>
         <Hero />
@@ -20,6 +20,6 @@ export default function Home() {
         <FAQSection />
       </main>
       <SiteFooter />
-    </>
+    </div>
   );
 }

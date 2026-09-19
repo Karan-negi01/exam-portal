@@ -45,6 +45,7 @@ export default function AdminCentersPage() {
     refresh();
   }
   async function handleConfirmSuspend() {
+    if (!suspending) return;
     await suspendCenter(suspending.id);
     setSuspending(null);
     refresh();

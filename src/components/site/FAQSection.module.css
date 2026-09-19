@@ -18,7 +18,10 @@
 }
 
 .heading {
-  font-size: 2.1rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.3rem;
+  letter-spacing: -0.02em;
 }
 
 .list {
@@ -39,8 +42,8 @@
 .item summary {
   cursor: pointer;
   list-style: none;
-  padding: 16px 0;
-  font-weight: 600;
+  padding: 18px 0;
+  font-weight: 700;
   font-size: 0.98rem;
   display: flex;
   align-items: center;
@@ -67,5 +70,5 @@
   color: var(--color-ink-soft);
   font-size: 0.9rem;
   line-height: 1.65;
-  padding-bottom: 18px;
+  padding-bottom: 20px;
 }

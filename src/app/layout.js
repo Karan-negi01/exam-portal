@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Bricolage_Grotesque, Manrope } from "next/font/google";
 import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
 
@@ -12,6 +12,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Marketing-site-only type family (scoped via the .site wrapper in globals.css)
+// — kept separate from the app's Geist pairing so dashboards are untouched.
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-site-display",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+});
+
+const manrope = Manrope({
+  variable: "--font-site-body",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+});
+
 export const metadata = {
   title: "CertifyHub — Exam & Certification Platform for Training Centers",
   description:
@@ -23,7 +37,7 @@ export default function RootLayout({ children }) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${bricolage.variable} ${manrope.variable}`}
     >
       <body>
         <AuthProvider>{children}</AuthProvider>

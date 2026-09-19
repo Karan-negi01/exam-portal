@@ -53,6 +53,7 @@ export default function CenterStudentsPage() {
   const remaining = center ? seatsRemaining(center.quota, students.length) : 0;
 
   async function handleRemoveConfirm() {
+    if (!removingStudent) return;
     await removeStudent(removingStudent.id);
     setRemovingStudent(null);
     refresh();

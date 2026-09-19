@@ -14,6 +14,7 @@ export function mapCenter(row) {
     location: row.location,
     courseTypes: row.course_types || [],
     panCardName: row.pan_card_name,
+    panCardPath: row.pan_card_path,
     status: row.status,
     createdAt: row.created_at,
     reviewedAt: row.reviewed_at,
