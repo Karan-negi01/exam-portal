@@ -1,3 +1,4 @@
+import Reveal from "./Reveal";
 import styles from "./HowItWorks.module.css";
 
 const STEPS = [
@@ -25,22 +26,23 @@ export default function HowItWorks() {
   return (
     <section id="how-it-works" className={styles.section}>
       <div className="container">
-        <div className={styles.head}>
+        <Reveal className={styles.head}>
           <div className={styles.kicker}>How it works</div>
           <h2 className={styles.heading}>From application to certificate in three steps</h2>
           <p className={styles.desc}>
             Everything your center needs to run exams online — verified, timed, and auto-graded.
           </p>
-        </div>
+        </Reveal>
 
         <div className={styles.steps}>
-          {STEPS.map((s) => (
-            <div className={styles.step} key={s.title}>
+          <div className={styles.connector} />
+          {STEPS.map((s, i) => (
+            <Reveal as="div" className={styles.step} key={s.title} delay={i * 120}>
               <div className={styles.stepNum}>{s.num}</div>
               <h3 className={styles.stepTitle}>{s.title}</h3>
               <p className={styles.stepDesc}>{s.desc}</p>
               <span className={styles.stepTag}>{s.tag}</span>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

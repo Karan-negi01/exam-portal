@@ -2,9 +2,17 @@
   position: sticky;
   top: 0;
   z-index: 50;
+  background: rgba(253, 252, 255, 0);
+  backdrop-filter: blur(0px);
+  border-bottom: 1px solid transparent;
+  transition: background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.header.scrolled {
   background: rgba(253, 252, 255, 0.86);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--color-border-soft);
+  box-shadow: 0 10px 30px -20px rgba(22, 19, 43, 0.25);
 }
 
 .bar {
@@ -24,18 +32,6 @@
   font-size: 1.2rem;
   letter-spacing: -0.01em;
   color: var(--color-ink);
-}
-
-.brandMark {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  color: #fff;
 }
 
 .nav {

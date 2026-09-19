@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "./Logo";
 import styles from "./SiteFooter.module.css";
 
 export default function SiteFooter() {
@@ -8,7 +9,7 @@ export default function SiteFooter() {
         <div className={styles.top}>
           <div>
             <div className={styles.brand}>
-              <span className={styles.brandMark}>🎓</span>
+              <LogoMark size={30} />
               Skorex
             </div>
             <p className={styles.blurb}>

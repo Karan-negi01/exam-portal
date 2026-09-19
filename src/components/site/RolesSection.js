@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Reveal from "./Reveal";
 import styles from "./RolesSection.module.css";
 
 const ROLES = [
@@ -45,15 +46,15 @@ export default function RolesSection() {
   return (
     <section id="roles" className={styles.section}>
       <div className="container">
-        <div className={styles.head}>
+        <Reveal className={styles.head}>
           <div className={styles.kicker}>Who it&apos;s for</div>
           <h2 className={styles.heading}>One platform, three roles, zero paperwork</h2>
           <p className={styles.desc}>Each role gets a dashboard built for exactly what they need to do.</p>
-        </div>
+        </Reveal>
 
         <div className={styles.grid}>
-          {ROLES.map((r) => (
-            <div className={styles.card} key={r.title}>
+          {ROLES.map((r, i) => (
+            <Reveal as="div" className={styles.card} key={r.title} delay={i * 120}>
               <span className={`${styles.badge} ${styles[r.tone]}`}>{r.badge}</span>
               <h3 className={styles.title}>{r.title}</h3>
               <div className={styles.list}>
@@ -67,7 +68,7 @@ export default function RolesSection() {
               <Link href={r.link} className={styles.link}>
                 {r.linkLabel}
               </Link>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

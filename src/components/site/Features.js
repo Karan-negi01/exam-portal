@@ -1,3 +1,4 @@
+import Reveal from "./Reveal";
 import styles from "./Features.module.css";
 
 const FEATURES = [
@@ -43,21 +44,21 @@ export default function Features() {
   return (
     <section id="features" className={styles.section}>
       <div className="container">
-        <div className={styles.head}>
+        <Reveal className={styles.head}>
           <div className={styles.kicker}>Features</div>
           <h2 className={styles.heading}>Everything a center needs to go digital</h2>
           <p className={styles.desc}>
             No more manual paperwork, spreadsheets, or handwritten certificates.
           </p>
-        </div>
+        </Reveal>
 
         <div className={styles.grid}>
-          {FEATURES.map((f) => (
-            <div className={styles.card} key={f.title}>
+          {FEATURES.map((f, i) => (
+            <Reveal as="div" className={styles.card} key={f.title} delay={(i % 3) * 100}>
               <div className={`${styles.icon} ${styles[f.tone]}`}>{f.icon}</div>
               <h3 className={styles.title}>{f.title}</h3>
               <p className={styles.text}>{f.text}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

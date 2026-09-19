@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoMark } from "./Logo";
 import styles from "./FormShell.module.css";
 
 const POINTS = [
@@ -15,7 +16,7 @@ export default function FormShell({ title, subtitle, maxWidth, children }) {
         <span className={styles.sideGlow2} />
 
         <Link href="/" className={styles.brand}>
-          <span className={styles.brandMark}>🎓</span>
+          <LogoMark size={32} />
           Skorex
         </Link>
 
@@ -40,7 +41,7 @@ export default function FormShell({ title, subtitle, maxWidth, children }) {
       <div className={styles.wrap}>
         <div className={styles.card} style={maxWidth ? { "--card-max": maxWidth } : undefined}>
           <Link href="/" className={styles.mobileBrand}>
-            <span className={styles.brandMark}>🎓</span>
+            <LogoMark size={28} />
             Skorex
           </Link>
 

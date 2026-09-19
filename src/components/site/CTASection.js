@@ -1,11 +1,12 @@
 import Button from "@/components/ui/Button";
+import Reveal from "./Reveal";
 import styles from "./CTASection.module.css";
 
 export default function CTASection() {
   return (
     <section className={styles.section}>
       <div className="container">
-        <div className={styles.panel}>
+        <Reveal as="div" className={styles.panel}>
           <div className={styles.text}>
             <h2 className={styles.title}>Ready to take your center online?</h2>
             <p className={styles.desc}>
@@ -21,7 +22,7 @@ export default function CTASection() {
               I already have an account
             </Button>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

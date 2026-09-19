@@ -4,21 +4,22 @@ import styles from "./Hero.module.css";
 export default function Hero() {
   return (
     <section className={styles.hero}>
+      <div className={styles.grain} />
       <div className={styles.blobPrimary} />
       <div className={styles.blobAccent} />
       <div className={`container ${styles.grid}`}>
         <div>
-          <span className={styles.eyebrow}>✦ Built for offline training centers</span>
-          <h1 className={styles.title}>
+          <span className={`${styles.eyebrow} ${styles.in1}`}>✦ Built for offline training centers</span>
+          <h1 className={`${styles.title} ${styles.in2}`}>
             Run exams. Issue certificates.{" "}
             <span className={styles.titleAccent}>Without the paperwork.</span>
           </h1>
-          <p className={styles.subtitle}>
+          <p className={`${styles.subtitle} ${styles.in3}`}>
             Skorex is where verified training centers enroll students, run timed MCQ exams
             online, and generate professional certificates — every result auto-graded, every
             certificate ready in seconds.
           </p>
-          <div className={styles.ctaRow}>
+          <div className={`${styles.ctaRow} ${styles.in4}`}>
             <Button href="/apply" size="lg">
               List your center →
             </Button>
@@ -26,7 +27,7 @@ export default function Hero() {
               See how it works
             </Button>
           </div>
-          <div className={styles.metaRow}>
+          <div className={`${styles.metaRow} ${styles.in5}`}>
             <span className={styles.metaItem}>
               <span className={styles.metaIcon}>●</span> Admin-verified centers only
             </span>
@@ -39,7 +40,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className={styles.visual}>
+        <div className={`${styles.visual} ${styles.in6}`}>
           <div className={styles.mockCard}>
             <div className={styles.mockCardBar}>
               <div className={styles.mockDots}>
@@ -91,6 +92,10 @@ export default function Hero() {
           </div>
         </div>
       </div>
+
+      <a href="#how-it-works" className={styles.scrollCue} aria-label="Scroll to how it works">
+        <span className={styles.scrollCueLine} />
+      </a>
     </section>
   );
 }

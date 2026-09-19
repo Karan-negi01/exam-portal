@@ -4,6 +4,16 @@
   overflow: hidden;
 }
 
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 90%);
+  opacity: 0.55;
+}
+
 .blobPrimary {
   position: absolute;
   top: -180px;
@@ -14,6 +24,7 @@
   background: radial-gradient(circle, rgba(84, 51, 224, 0.16), transparent 68%);
   filter: blur(10px);
   z-index: 0;
+  animation: driftA 16s ease-in-out infinite;
 }
 
 .blobAccent {
@@ -26,6 +37,40 @@
   background: radial-gradient(circle, rgba(255, 106, 61, 0.16), transparent 70%);
   filter: blur(10px);
   z-index: 0;
+  animation: driftB 18s ease-in-out infinite;
+}
+
+@keyframes driftA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-30px, 30px) scale(1.06); }
+}
+
+@keyframes driftB {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(24px, -24px) scale(1.05); }
+}
+
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.in1, .in2, .in3, .in4, .in5, .in6 {
+  opacity: 0;
+  animation: heroIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.in1 { animation-delay: 0.05s; }
+.in2 { animation-delay: 0.15s; }
+.in3 { animation-delay: 0.28s; }
+.in4 { animation-delay: 0.4s; }
+.in5 { animation-delay: 0.5s; }
+.in6 { animation-delay: 0.35s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .blobPrimary, .blobAccent, .in1, .in2, .in3, .in4, .in5, .in6 {
+    animation: none;
+    opacity: 1;
+  }
 }
 
 .grid {
@@ -113,6 +158,17 @@
   border-radius: var(--radius-lg);
   box-shadow: 0 40px 70px -24px rgba(22, 19, 43, 0.24);
   overflow: hidden;
+  animation: floatCard 6s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes floatChip {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 .mockCardBar {
@@ -206,6 +262,8 @@
   box-shadow: 0 24px 46px -16px rgba(22, 19, 43, 0.3);
   padding: 14px 18px;
   max-width: 230px;
+  animation: floatChip 5s ease-in-out infinite;
+  animation-delay: 0.6s;
 }
 
 .chipEmoji {
@@ -238,6 +296,8 @@
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--color-ink);
+  animation: floatChip 5.5s ease-in-out infinite;
+  animation-delay: 1.1s;
 }
 
 .chipDot {
@@ -268,5 +328,46 @@
 @media (max-width: 480px) {
   .title {
     font-size: 2.05rem;
+  }
+}
+
+.scrollCue {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  width: 26px;
+  height: 40px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.scrollCueLine {
+  width: 3px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  animation: scrollCueMove 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollCueMove {
+  0% { opacity: 1; transform: translateY(0); }
+  70% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+@media (max-width: 700px) {
+  .scrollCue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mockCard, .chipCert, .chipVerified, .scrollCueLine {
+    animation: none;
   }
 }

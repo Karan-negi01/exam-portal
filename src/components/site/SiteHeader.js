@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import { LogoMark } from "./Logo";
 import styles from "./SiteHeader.module.css";
 
 const LINKS = [
@@ -14,12 +15,22 @@ const LINKS = [
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    function onScroll() {
+      setScrolled(window.scrollY > 8);
+    }
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${scrolled ? styles.scrolled : ""}`}>
       <div className={`container ${styles.bar}`}>
         <Link href="/" className={styles.brand}>
-          <span className={styles.brandMark}>🎓</span>
+          <LogoMark size={34} />
           Skorex
         </Link>
 

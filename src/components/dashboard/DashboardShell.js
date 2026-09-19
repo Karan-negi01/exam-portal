@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { getInitials } from "@/lib/ids";
+import { LogoMark } from "@/components/site/Logo";
 import styles from "./DashboardShell.module.css";
 
 export default function DashboardShell({ navItems, roleTag, userMeta, title, subtitle, actions, children }) {
@@ -20,7 +21,7 @@ export default function DashboardShell({ navItems, roleTag, userMeta, title, sub
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
         <div className={styles.brand}>
-          <span className={styles.brandMark}>🎓</span>
+          <LogoMark size={32} />
           Skorex
         </div>
         <div className={styles.roleTag}>{roleTag}</div>
