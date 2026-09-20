@@ -72,7 +72,7 @@ export default function PrivacyPolicyPage() {
         <p>We do not sell your personal information. We may share information:</p>
         <ul>
           <li>With the training center a student is enrolled under, for the purpose of managing that student&apos;s exams and certificates</li>
-          <li>With payment processors (such as Razorpay) solely to process Seat Pack payments</li>
+          <li>With payment processors and coordination channels (such as WhatsApp) solely to process Seat Pack payments</li>
           <li>With SMS/communication service providers to deliver login credentials and notifications</li>
           <li>With law enforcement or regulatory authorities, where required by law</li>
           <li>With service providers who help us operate the Platform (e.g., hosting), under confidentiality obligations</li>

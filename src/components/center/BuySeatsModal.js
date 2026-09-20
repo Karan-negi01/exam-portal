@@ -18,7 +18,7 @@ export default function BuySeatsModal({ centerId, onClose, onPurchased }) {
     e.preventDefault();
     if (!seats || seats < 1) return;
     setPaying(true);
-    // Razorpay isn't wired up yet — this simulates a successful payment for the demo.
+    // No payment gateway wired up yet — this simulates a successful payment for the demo.
     setTimeout(async () => {
       await addSeats(centerId, Number(seats));
       setPaying(false);
@@ -44,7 +44,7 @@ export default function BuySeatsModal({ centerId, onClose, onPurchased }) {
         </div>
 
         <Button type="submit" block disabled={paying}>
-          {paying ? "Processing…" : `Pay ${formatRupees(amount)} via Razorpay (demo)`}
+          {paying ? "Processing…" : `Pay ${formatRupees(amount)} (demo)`}
         </Button>
       </form>
     </Modal>

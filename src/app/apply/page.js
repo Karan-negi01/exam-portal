@@ -35,6 +35,25 @@ const EMPTY = {
   seats: 10,
 };
 
+const PAYMENT_WHATSAPP_NUMBER = "919311444193";
+
+function buildWhatsappMessage({ name, ownerName, phone, email, location, courseTypes, seats, amount }) {
+  const lines = [
+    "New Skorex center application",
+    "",
+    `Center: ${name}`,
+    `Owner: ${ownerName}`,
+    `Phone: ${phone}`,
+    `Email: ${email}`,
+    `Location: ${location}`,
+    `Courses: ${courseTypes.join(", ")}`,
+    `Seats: ${seats} (${formatRupees(amount)})`,
+    "",
+    "Please share the payment QR so my application can be approved.",
+  ];
+  return `https://wa.me/${PAYMENT_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+}
+
 export default function ApplyPage() {
   const [form, setForm] = useState(EMPTY);
   const [file, setFile] = useState(null);
@@ -75,7 +94,7 @@ export default function ApplyPage() {
     return next;
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setFormError("");
     const validation = validate();
@@ -87,24 +106,33 @@ export default function ApplyPage() {
     );
 
     setPaying(true);
-    // Razorpay isn't wired up yet — this simulates a successful payment for the demo.
-    setTimeout(async () => {
-      const result = await applyForCenter(
-        {
-          ...form,
-          courseTypes: finalCourseTypes,
-          seats: Number(form.seats),
-          panCardName: fileName || null,
-        },
-        file
-      );
-      setPaying(false);
-      if (!result.ok) {
-        setFormError(result.error);
-        return;
-      }
-      setSubmitted(result.center);
-    }, 700);
+    const result = await applyForCenter(
+      {
+        ...form,
+        courseTypes: finalCourseTypes,
+        seats: Number(form.seats),
+        panCardName: fileName || null,
+      },
+      file
+    );
+    setPaying(false);
+    if (!result.ok) {
+      setFormError(result.error);
+      return;
+    }
+    setSubmitted({
+      ...result.center,
+      whatsappUrl: buildWhatsappMessage({
+        name: form.name,
+        ownerName: form.ownerName,
+        phone: form.phone,
+        email: form.email,
+        location: form.location,
+        courseTypes: finalCourseTypes,
+        seats: Number(form.seats),
+        amount,
+      }),
+    });
   }
 
   if (submitted) {
@@ -115,9 +143,9 @@ export default function ApplyPage() {
             <div className={styles.successIcon}>✓</div>
             <h1 className={styles.successTitle}>Application submitted</h1>
             <p className={styles.successText}>
-              Thanks, {submitted.ownerName.split(" ")[0]}! Your center &ldquo;{submitted.name}&rdquo; is
-              now awaiting admin review. You&apos;ll be able to log in and start enrolling students
-              as soon as it&apos;s approved.
+              Thanks, {submitted.ownerName.split(" ")[0]}! Send us your details on WhatsApp below —
+              we&apos;ll share a payment QR for your Seat Pack. Once paid, our admin team approves
+              your center and you can start enrolling students.
             </p>
             <div className={styles.successCard}>
               <div className={styles.successRow}>
@@ -131,15 +159,20 @@ export default function ApplyPage() {
                 </span>
               </div>
               <div className={styles.successRow}>
-                <span>Valid till</span>
-                <span>{formatDate(submitted.quota.expiresAt)}</span>
-              </div>
-              <div className={styles.successRow}>
                 <span>Status</span>
-                <span>Pending review</span>
+                <span>Awaiting payment &amp; approval</span>
               </div>
             </div>
-            <Button href="/login" block>
+            <Button
+              href={submitted.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              block
+              style={{ background: "#25D366", borderColor: "#25D366" }}
+            >
+              Send details on WhatsApp →
+            </Button>
+            <Button href="/login" variant="secondary" block style={{ marginTop: 10 }}>
               Go to login
             </Button>
           </div>
@@ -273,8 +306,12 @@ export default function ApplyPage() {
           </div>
 
           <Button type="submit" size="lg" block disabled={paying}>
-            {paying ? "Processing payment…" : `Submit & pay ${formatRupees(amount)} via Razorpay (demo)`}
+            {paying ? "Submitting…" : "Submit application"}
           </Button>
+
+          <p className={styles.footNote}>
+            After submitting, send us your details on WhatsApp and we&apos;ll share a payment QR.
+          </p>
 
           <p className={styles.footNote}>
             Already listed? <a href="/login">Log in instead</a>
