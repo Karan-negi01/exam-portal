@@ -9,23 +9,22 @@ export function LogoMark({ size = 36 }) {
           <stop offset="100%" stopColor="#ff6a3d" />
         </linearGradient>
       </defs>
-      <rect width="40" height="40" rx="11" fill="url(#skorexMarkGrad)" />
       <path
         d="M11 20.5L16.2 25.8L22 18.5"
-        stroke="white"
-        strokeWidth="3"
+        stroke="url(#skorexMarkGrad)"
+        strokeWidth="3.6"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M20.5 20L25.5 14.5L30.5 17.5"
-        stroke="white"
-        strokeWidth="3"
+        stroke="url(#skorexMarkGrad)"
+        strokeWidth="3.6"
         strokeLinecap="round"
         strokeLinejoin="round"
         opacity="0.95"
       />
-      <circle cx="30.5" cy="12.8" r="2.4" fill="white" />
+      <circle cx="30.5" cy="12.8" r="2.7" fill="url(#skorexMarkGrad)" />
     </svg>
   );
 }
