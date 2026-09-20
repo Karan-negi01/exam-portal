@@ -18,9 +18,21 @@ import { useAsyncData } from "@/lib/useAsyncData";
 import { getFullDb } from "@/actions/db";
 import { addStudent, removeStudent, resetStudentPassword } from "@/actions/students";
 import { sendStudentCredentialsSms } from "@/lib/notify";
+import { sendStudentCredentialsEmail } from "@/actions/notify";
 import { seatsRemaining } from "@/lib/pricing";
 import { formatDate, getInitials } from "@/lib/ids";
 import styles from "./page.module.css";
+
+// Emails credentials when the student has an email on file (real delivery via
+// Resend); otherwise falls back to the simulated SMS the demo has always used.
+async function deliverCredentials(student, centerName) {
+  if (student.email) {
+    const result = await sendStudentCredentialsEmail(student, centerName || "your center");
+    return { emailSent: result.ok, emailError: result.ok ? null : result.error };
+  }
+  const sms = await sendStudentCredentialsSms(student);
+  return { smsSent: sms.ok };
+}
 
 export default function CenterStudentsPage() {
   const { session } = useAuth();
@@ -64,8 +76,8 @@ export default function CenterStudentsPage() {
     const result = await resetStudentPassword(student.id);
     setResettingStudent(null);
     if (!result.ok) return;
-    const sms = await sendStudentCredentialsSms(result.student);
-    setJustAdded({ ...result.student, smsSent: sms.ok, reset: true });
+    const delivered = await deliverCredentials(result.student, center?.name);
+    setJustAdded({ ...result.student, ...delivered, reset: true });
   }
 
   const query = search.trim().toLowerCase();
@@ -113,7 +125,13 @@ export default function CenterStudentsPage() {
           <span>
             ✓ {justAdded.reset ? `${justAdded.name}'s password reset` : `${justAdded.name} added`} —
             login is <b>{justAdded.phone}</b> + password <b>{justAdded.password}</b>.{" "}
-            {justAdded.smsSent ? "Sent to their phone via SMS (demo)." : ""}
+            {justAdded.emailSent
+              ? `Emailed to ${justAdded.email}.`
+              : justAdded.emailError
+                ? `Couldn't email it (${justAdded.emailError}) — share it manually.`
+                : justAdded.smsSent
+                  ? "Sent to their phone via SMS (demo)."
+                  : ""}
           </span>
           <Button size="sm" variant="ghost" onClick={() => setJustAdded(null)}>
             Dismiss
@@ -194,6 +212,7 @@ export default function CenterStudentsPage() {
       {modalOpen && (
         <AddStudentModal
           centerId={centerId}
+          centerName={center?.name}
           remainingSeats={remaining}
           onClose={() => setModalOpen(false)}
           onAdded={(student) => {
@@ -234,9 +253,10 @@ export default function CenterStudentsPage() {
   );
 }
 
-function AddStudentModal({ centerId, remainingSeats, onClose, onAdded, onBuySeats }) {
+function AddStudentModal({ centerId, centerName, remainingSeats, onClose, onAdded, onBuySeats }) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
   if (remainingSeats <= 0) {
@@ -257,10 +277,14 @@ function AddStudentModal({ centerId, remainingSeats, onClose, onAdded, onBuySeat
     e.preventDefault();
     if (!name.trim()) return setError("Student name is required.");
     if (!phone.trim()) return setError("Phone number is required — students log in with it.");
-    const result = await addStudent(centerId, { name: name.trim(), phone: phone.trim() });
+    const result = await addStudent(centerId, {
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim() || null,
+    });
     if (!result.ok) return setError(result.error);
-    const sms = await sendStudentCredentialsSms(result.student);
-    onAdded({ ...result.student, smsSent: sms.ok });
+    const delivered = await deliverCredentials(result.student, centerName);
+    onAdded({ ...result.student, ...delivered });
   }
 
   return (
@@ -272,6 +296,14 @@ function AddStudentModal({ centerId, remainingSeats, onClose, onAdded, onBuySeat
         </Field>
         <Field label="Phone number" hint="Required — this is how they'll log in">
           <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+91 98765 43210" />
+        </Field>
+        <Field label="Email" hint="Optional — if given, their login is emailed to them automatically">
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="student@example.com"
+          />
         </Field>
         <Button type="submit" block>
           Add student

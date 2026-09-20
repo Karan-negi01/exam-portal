@@ -34,6 +34,7 @@ create table if not exists students (
   student_code text not null,
   name text not null,
   phone text not null,
+  email text,
   password_hash text not null,
   created_at timestamptz not null default now()
 );

@@ -35,6 +35,7 @@ export function mapStudent(row) {
     studentCode: row.student_code,
     name: row.name,
     phone: row.phone,
+    email: row.email,
     createdAt: row.created_at,
   };
 }

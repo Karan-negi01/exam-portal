@@ -6,7 +6,7 @@ import { generatePassword, normalizePhone } from "@/lib/ids";
 import { isQuotaExpired } from "@/lib/pricing";
 import { mapStudent } from "./mappers";
 
-export async function addStudent(centerId, { name, phone }) {
+export async function addStudent(centerId, { name, phone, email }) {
   const supabase = getSupabaseServerClient();
 
   if (!phone || !normalizePhone(phone)) {
@@ -47,6 +47,7 @@ export async function addStudent(centerId, { name, phone }) {
       student_code: `${center.code}-${nextNumber}`,
       name,
       phone,
+      email: email || null,
       password_hash: passwordHash,
     })
     .select()
